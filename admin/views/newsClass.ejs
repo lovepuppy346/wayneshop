@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="utf-8" />
+	<title><%=headerTitle%> | <%= title%></title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+	<link href="<%=coloradmin%>plugins/switchery/switchery.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/powerange/powerange.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+
+	<%include include/all %>
+  <style>
+      .fa-2x {
+          font-size: 1.5em;
+      }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%include include/user%>
+				<%include include/nav%>
+			</div>
+		</div>
+		
+<div class="sidebar-bg"></div>
+
+<div id="content" class="content">
+			<h1 class="page-header">
+			
+			<span><%= title%></span>
+			
+			</h1>
+			<div class="row">
+		<div class="col-md-12">
+            <div class="panel panel-inverse">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    </div>
+                    <h4 class="panel-title">
+<!--                    <span style="margin-right: 15px;">分類</span>-->
+                    <button id="new" @click="new_data()" style="margin-right: 15px;" type="button" class="btn btn-success m-r-5 m-b-5 btn-sm">新增分類</button>
+                       <button id="cancel_save" @click="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm">取消儲存</button>
+                        <button id="save" disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm">儲存</button>
+                    </h4>
+                </div>
+              <div class="panel-body">
+                <div id="wizard">
+                 <div class="row" style="padding-top:15px">
+                      <div class="col-md-2">
+                        <label>分類名稱</label>
+                      </div>
+                      <div class="col-md-2">
+                        <label>主標語</label>
+                      </div>
+                      <div class="col-md-4">
+                        <label>封面圖片/說明</label>
+                      </div>
+                      <div class="col-md-1">
+                         <label>排序</label>
+                      </div>
+                      <div class="col-md-1">
+                         <label>開關</label>
+                      </div>
+                      <div class="col-md-1">
+                          &nbsp;
+                      </div>
+                  </div>             
+                  <hr>
+                  <div style="padding-top:5px;" v-for="(item, index) in pageClass_sort">
+                     <div class="row">
+                            <div class="col-md-2">
+                               <input v-model.trim="item.name" maxlength="30" type="text" class="form-control" placeholder="填寫分類名稱" />
+                            </div>
+                            <div class="col-md-2">
+                               <input v-model.trim="item.slogan" maxlength="30" type="text" class="form-control" placeholder="填寫主標語" />
+                            </div>
+                            <div class="col-md-4">
+                                 <div v-if="item.img" class="row">
+                                  <div class="col-md-7">
+                                    <img :src="item.img" style="margin-bottom:15px;width:100%;">
+                                  </div>
+                                 
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-7">
+                                    <input type="text" class="form-control" v-model="item.img" placeholder="請貼上圖片的網址，或上傳" /> 
+                                  </div>
+                                  <div class="col-md-3">
+                                     <form enctype="multipart/form-data" method="post">
+                                         <span class="btn btn-success fileinput-button">
+                                              <i class="fa fa-plus"></i>
+                                              <span v-if="is_upload_loading_txt && change_index == index">{{is_upload_loading_txt}}</span>
+                                              <span v-else>上傳圖片</span>
+                                              <input type="file" @change="file_change($event,'files',index);change(index)" class="files" name="files" 
+                                              :disabled="change_index !== false"
+                                              accept="image/png,image/gif,image/jpg,image/jpeg" multiple=""
+                                              >
+                                          </span>
+                                     </form>
+                                  </div>
+                                </div>
+                               <textarea style="margin-top:10px;" v-model.trim="item.introduction" class="form-control" rows="4" placeholder="填寫說明"></textarea>
+                               
+                            </div>
+                            <div class="col-md-1">
+                              <a v-if="index>0" @click="up(index)" href="javascript:void(0)"><i class="fa fa-2x fa-arrow-up"></i></a>
+                              <a v-if="index<pageClass_sort.length-1" @click="down(index)" href="javascript:void(0)"><i class="fa fa-2x fa-arrow-down"></i></a>
+                            </div>
+                            <div class="col-md-1">
+                                <input :id="'switchery'+index" type="checkbox" data-render="switchery" data-theme="black" v-model="item.checked" /> 
+                            </div>
+                            <div class="col-md-1">
+                              <a @click="delete_data(index)" class="btn btn-warning" role="button">刪除</a>
+                            </div>
+                    </div>
+                     <hr>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-12" style="text-align:center">
+                       <button onclick="new_data()" style="margin-right: 15px;" type="button" class="btn btn-success m-r-5 m-b-5 new">新增分類</button>
+                       <button @click="cancel_save()" style="display:none;" type="button" class="btn btn-defautl m-r-5 m-b-5 cancel_save">取消儲存</button>
+                        <button disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 save">儲存</button>
+                    </div>
+                  </div>
+              </div>
+            </div>
+         </div>
+       </div>
+		</div>
+  <% include include/scroll_top%>
+</div>
+</div>
+  <script src="<%=coloradmin%>plugins/switchery/switchery.min.js"></script>
+  <script src="<%=coloradmin%>plugins/powerange/powerange.min.js"></script>
+  <script src="<%=coloradmin%>js/form-slider-switcher.demo.min.js"></script>
+  <script src="<%=coloradmin%>js/apps.min.js"></script>
+  <script>
+  // 進度條 https://github.com/CodeByZach/pace
+
+  var vm = new Vue({
+    el: '#content',
+    data: {
+      pageClass:  <%- data%>,
+      delete_id:[],
+      change_index : false,
+      is_upload_loading_txt:"",
+      is_upload_loading:false
+    },
+   mounted:async function(){
+     
+   },
+    computed: {
+      pageClass_sort: function () {
+        var _sort=this.pageClass;
+        _sort = _sort.sort(function (a, b) {
+          if (a.sort > b.sort) return 1; //照sort
+          return -1;
+        });
+        return _sort;
+      }
+    },
+    methods: {
+      change: function(index){
+        this.change_index = index
+      },
+      up: function(index){
+        this.pageClass[index].sort=this.pageClass[index].sort-1;
+        this.pageClass[index-1].sort=this.pageClass[index-1].sort+1;
+        
+        vm.set_save();
+        vm.set_all();
+      },
+      down: function(index){
+        this.pageClass[index].sort=this.pageClass[index].sort+1;
+        this.pageClass[index+1].sort=this.pageClass[index+1].sort-1;
+
+        vm.set_save();
+        vm.set_all();
+      },
+      delete_data: function(index){
+     if(!window.confirm("確定要刪除資料 ! (必需按下儲存送出後，資料才會刪除。)")) return
+        
+        vm.delete_id.push(vm.pageClass[index].id);
+        vm.pageClass.splice(index, 1);
+        vm.set_save();
+        vm.set_all();
+        for(var i=0;i<vm.pageClass.length;i++){
+          vm.pageClass[i].sort=i+1;
+        }
+      },
+      save_data: async function(fn){
+        //檢查 name 是否有填
+        var _array=[];
+        for(var i=0;i<vm.pageClass.length;i++){
+          if(vm.pageClass[i].name == "") return alert("分類名稱必填")
+          _array.push(vm.pageClass[i].name);
+        }
+       if(hasDuplicates(_array)) return alert("分類名稱不能重複")
+
+          for(var i=0;i<this.delete_id.length;i++){
+            //刪除最新消息
+            var ref = await db.collection('NEWS').where("newsClass","==",this.delete_id[i]).get();
+
+            for(var j=0;j<ref.docs.length;j++){
+              await ref.docs[j].ref.update({
+                newsClass: "",
+                open: false,
+                updateAt: firebase.firestore.FieldValue.serverTimestamp()
+              })
+            }
+          }
+        
+          $.post("/admin/newsClass", {
+            data : JSON.stringify(vm.pageClass)
+          },function(data){
+            location.reload();
+          })
+
+      },
+      new_data:function(){
+        // 這邊有遞迴程式
+        var id = generateSerial();
+        
+        check_id(id);
+        
+        function check_id(id){
+          for(var i=0;i<vm.pageClass.length;i++){
+            if(vm.pageClass[i].id == id){
+              id = generateSerial()
+              return check_id(id) 
+            }
+          }
+        }
+        
+        vm.pageClass.push({
+          id: id,
+          name : "",
+          img: "https://picsum.photos/1300/500/?random",
+          checked : "",
+          sort : vm.pageClass.length + 1,
+        });
+         vm.set_save();
+        setTimeout(function(){
+          renderSwitcher2("#switchery"+(vm.pageClass.length-1))
+        },0)
+      },
+      cancel_save:function(){
+        location.reload();
+      },
+      set_save: function(a){
+        if(a){
+          $('#save,.save').attr("disabled","disabled");
+          $("#cancel_save,.cancel_save").hide();
+//          $('#new ,.new').removeAttr("disabled");
+        }else{
+          $('#save,.save').removeAttr("disabled");
+          $("#cancel_save,.cancel_save").show()
+//          $('#new ,.new').attr("disabled","disabled");
+        }
+      },
+      set_all: function(){
+        setTimeout(function(){
+          $(".switchery").trigger("click").trigger("click");
+        },0)
+      }
+    }
+  })
+  $(function(){
+    $('input,textarea').on("change input",function(){
+      vm.set_save();
+    })
+  })
+  $(document).ready(function() {
+    App.init();
+    FormSliderSwitcher.init();
+  });
+
+    //上方按鈕置頂
+    function save_data(){
+      vm.save_data()
+    }
+    function cancel_save(){
+      vm.cancel_save()
+    }
+    function new_data(){
+      vm.new_data()
+    }
+    $("#button_use").append('<button onclick="new_data()" style="margin-right: 15px;" type="button" class="btn btn-success m-r-5 m-b-5 btn-sm new">新增分類</button><button onclick="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save">取消儲存</button><button disabled="disabled" type="button" onclick="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>')
+    $("#button_use").hide();
+    $(window).scroll(nav_scroll);
+    function nav_scroll(){
+      var _scroll_top=$("#header").offset().top;
+        if(_scroll_top > 100){
+          $("#button_use").show();
+        }else{
+          $("#button_use").hide()
+        }
+        return
+    }
+  function hasDuplicates(array) {
+      var valuesSoFar = Object.create(null);
+      for (var i = 0; i < array.length; ++i) {
+          var value = array[i];
+          if (value in valuesSoFar) {
+              return true;
+          }
+          valuesSoFar[value] = true;
+      }
+      return false;
+  }
+  function generateSerial() {
+    var chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+        serialLength = 6,
+        randomSerial = "",
+        i,
+        randomNumber;
+    for (i = 0; i < serialLength; i = i + 1) {
+        randomNumber = Math.floor(Math.random() * chars.length);
+        randomSerial += chars.substring(randomNumber, randomNumber + 1);
+    }
+    return randomSerial 
+  }
+  function success(url,source,_number,index){
+    vm.pageClass[index].img = url;
+    vm.is_upload_loading_txt = "";
+    vm.is_upload_loading = false;
+    vm.change_index = false
+  }
+</script>
+	
+</body>
+</html>

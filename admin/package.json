@@ -1,0 +1,10 @@
+{
+    "name": "wayne-admin",
+    "version": "0.0.0",
+    "private": true,
+    "main": "app.js",
+    "scripts": {
+    },
+    "dependencies": {
+    }
+  }

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="utf-8" />
+	<title><%=headerTitle%> | <%= title%></title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+	<link href="<%=coloradmin%>plugins/switchery/switchery.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/powerange/powerange.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+
+    <%include include/froalaeditor_css %>
+	<%include include/all %>
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <% include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<% include include/user %>
+				<% include include/nav %>
+			</div>
+		</div>
+		
+<div class="sidebar-bg"></div>
+
+<div id="content" class="content">
+			<h1 class="page-header"><%= title%></h1>
+			<div class="row">
+			    <div class="col-md-12">
+            <div class="panel panel-inverse">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    </div>
+                    <h4 class="panel-title">
+                      <span style="margin-right: 15px;">
+                         <span style="margin-right: 15px;">關於我們</span>
+                         <button @click="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save">取消儲存</button>
+                        <button id="save" disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>
+                      
+                      </span>
+                    </h4>
+                </div>
+                 <div class="alert alert-info fade in" style="margin-bottom:0;border-radius:0">
+                   <font style="vertical-align: inherit;">
+                     <i class="fa fa-info-circle fa-lg m-r-5 pull-left m-t-2"></i>
+                       關於我們共分兩區塊，顯示於首頁和內頁。
+                   </font>
+                   <span class="close" data-dismiss="alert" style="font-size:16px;">×</span>
+                 </div>
+              <div class="panel-body">
+                <div id="wizard">
+                  <div style="padding-top:15px;">
+                     <div class="row">
+                      
+                    <div v-if="about.img" class="col-md-12"> 
+                     <div class="form-horizontal" style="text-align: center;">
+                         <div class="form-group">
+                           <img style="width:50%;margin-bottom:10px" :src="about.img">
+                         </div>
+                      </div>
+                       </div>
+                    </div>
+                      <div class="row">
+                    <div class="col-md-12"> 
+                        <div class="form-horizontal">
+                           <div class="form-group">
+                                <label class="col-md-3 control-label">圖片</label>
+                                <div class="col-md-5">
+                                  <input type="text" class="form-control" v-model="about.img" placeholder="請貼上圖片的網址，或上傳"  /> 
+                                 </div>
+                               <div class="col-md-2">
+                                <form enctype="multipart/form-data" method="post">
+                                 <span class="btn btn-success fileinput-button">
+                                      <i class="fa fa-plus"></i>
+                                      <span v-if="is_upload_loading_txt">{{is_upload_loading_txt}}</span>
+                                      <span v-else>上傳圖片</span>
+                                      <input type="file" @change="file_change($event,'files')" class="files" name="files" accept="image/png,image/gif,image/jpg,image/jpeg" multiple="">
+                                  </span>
+
+                                 </form>
+                               </div>
+                             </div>
+                         </div>
+                        </div>
+                        <div class="col-md-12"> 
+                        <div class="form-horizontal">
+                        <div class="form-group">
+                          <label class="col-md-3 control-label">小標題</label>
+                          <div class="col-md-7">
+                            <input v-model="about.small_title" type="text" class="form-control" placeholder="填寫小標題" />
+                          </div>
+                        </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12"> 
+                        <div class="form-horizontal">
+                        <div class="form-group">
+                          <label class="col-md-3 control-label">標題</label>
+                          <div class="col-md-7">
+                            <input v-model="about.title" type="text" class="form-control" placeholder="填寫標題" />
+                          </div>
+                        </div>
+                        </div>
+                      </div>
+                       
+                       <div class="col-md-12"><hr></div>
+                       <div class="col-md-12">
+                           <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">內文</label>
+                                  <div class="col-md-7">
+                                     <textarea id="content_inner" v-model="about.content_inner" class="textarea_use form-control" style="margin-top: 10px;" rows="5">{{about.content_inner}}</textarea>
+                                  </div>
+                                </div>
+                           </div>
+                       </div>
+                  
+                       <div class="col-md-12"> 
+                          <div style="margin-left:10px;text-align:center">
+                              <button @click="cancel_save()" style="display:none;" type="button" class="btn btn-default m-r-5 m-b-5 cancel_save">取消儲存</button>
+                              <button disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 save">儲存</button>
+                            </div>
+                         </div>
+                     
+                    </div>
+                     <hr>
+                  </div>
+                     <form enctype="multipart/form-data" method="post" style="display:none">
+                       <span class="btn btn-success fileinput-button">
+                            <i class="fa fa-plus"></i>
+                            <span>上傳圖片</span>
+                            <input id="history_file" type="file" @change="file_change($event,'history_file')" class="files" name="files" accept="image/png,image/gif,image/jpg,image/jpeg" multiple="">
+                        </span>
+                     </form>
+              </div>
+            </div>
+         </div>
+       </div>
+		</div>
+  <%include include/scroll_top%>
+</div>
+</div>
+
+
+  <script src="<%=coloradmin%>plugins/switchery/switchery.min.js"></script>
+  <script src="<%=coloradmin%>plugins/powerange/powerange.min.js"></script>
+  <script src="<%=coloradmin%>js/form-slider-switcher.demo.min.js"></script>
+
+  <%include include/froalaeditor_js%>
+  
+  <script src="<%=coloradmin%>js/apps.min.js"></script>
+
+<script>
+  var vm = new Vue({
+    el: '#content',
+    data:{
+      about: <%-data%>,
+      is_upload_loading_txt : "",
+      is_upload_loading : false
+    },
+    methods: {
+      file_change: file_change,
+      save_data: function(){
+
+        $.post("/admin/about", {
+          data : JSON.stringify(vm.about)
+        },function(data){
+          location.reload();
+        })
+
+      },
+      cancel_save:function(){
+        location.reload();
+      },
+      set_save: function(a){
+        if(a){
+          $('#save,.save').attr("disabled","disabled");
+          $("#cancel_save,.cancel_save").hide();
+          $('#new ,.new').removeAttr("disabled");
+          
+        }else{
+          $('#save,.save').removeAttr("disabled");
+          $("#cancel_save,.cancel_save").show()
+          $('#new ,.new').attr("disabled","disabled");
+        }
+      }
+    }
+  })
+
+  $(function(){
+    $('input,textarea').on("change input",function(){
+      vm.set_save();
+    })
+  })
+   
+  
+      //froala-editor編輯器程式碼
+  $(function() {
+    $.FroalaEditor.DefineIcon('insert', {NAME: 'image'});
+    $.FroalaEditor.RegisterCommand('insert', {
+      title: '新增圖片',
+      focus: true,
+      undo: true,
+      refreshAfterCallback: true,
+      callback: upload_img
+    });
+    $.FroalaEditor.RegisterQuickInsertButton('insert', {
+      icon: 'insert',
+      title: '新增圖片',
+      // Callback for the button.
+      callback: upload_img,
+      focus: true,
+      undo: true
+    })
+    $('.textarea_use').froalaEditor({
+       heightMin: 300,
+       heightMax: 600,
+       <%include include/froalaeditor_tool_2%>
+    })
+   
+
+    $('.textarea_use').on('froalaEditor.contentChanged', function (e, editor) {
+      var id=e.target.id;
+      vm.about[id] = $(e.target).froalaEditor('html.get');
+      vm.set_save();
+    });
+    
+
+  });
+  
+  $(document).ready(function() {
+    App.init();
+  });
+       //上方按鈕置頂
+  function save_data(){
+    vm.save_data();
+  }
+  function cancel_save(){
+    vm.cancel_save();
+  }
+  $("#button_use").append('<button onclick="cancel_save()" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save" style="display:none;">取消儲存</button><button disabled="disabled" type="button" onclick="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>')
+  $("#button_use").hide();
+  $(window).scroll(nav_scroll);
+  function nav_scroll(){
+    var _scroll_top=$("#header").offset().top;
+      if(_scroll_top > 100){
+        $("#button_use").show();
+      }else{
+        $("#button_use").hide()
+      }
+      return
+  }  
+  
+ //上傳檔案自訂 functions
+ var upload_fn ;
+ function upload_img(){
+    $("#history_file").trigger('click');
+    var that = this;
+    upload_fn=function(src){
+      that.html.insert("<img style='width:100%' src='"+src+"' />");
+    }
+  }
+ function success(url,source,_number,index){
+    if(source == "files"){
+       clear_uploadFile();
+       vm.$set(vm.about,"img", url);
+       $("#files").val("")
+     }else{
+    upload_fn(url);
+    if(_number == 0)  $("#history_file").val("");
+   }
+  }
+
+</script>
+	
+</body>
+</html>

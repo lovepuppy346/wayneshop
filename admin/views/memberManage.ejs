@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <title><%=headerTitle%> | <%= title%></title>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+	<link href="<%=coloradmin%>plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+
+  
+    <%include include/all %>
+	<style>
+      .dataTables_empty{
+        display: table-cell!important
+      }
+
+      .pace{
+        display:none!important
+      }
+      
+  </style>
+	<script>
+      var member_data = [];
+      function loadData(){
+          //找出所有管理者資料
+          var db = firebase.firestore();
+          var docRef = db.collection("ADMIN")
+         
+//          docRef = docRef.orderBy("updateAt", "desc");
+//        
+          $("#data-table").addClass("complete")
+          docRef.get().then(function(querySnapshot) {
+         // docRef.onSnapshot(function(querySnapshot) {
+            var aaData = [];
+            member_data = [];
+        
+            querySnapshot.forEach(function(doc){
+              var _data = doc.data();
+              var uid = _data.uid || "";
+//              var uidType = _data.uidType || "";
+              var name = _data.name || "";
+              var root = _data.root || "沒有權限";
+              var note = _data.note || "";
+              var link = _data.link || "";
+              var password = _data.password || "";
+
+              var teacher = _data.teacher || {}
+              
+              aaData.push([
+                  timestampToDate(_data.updateAt.seconds), uid, name,  root.toString(), note, htmlFn(uid)
+              ])
+              member_data.push([uid,name,root,note,password,link]);
+              
+            })
+
+            $("#data-table").DataTable({
+              lengthMenu: [50, 100, 200],
+              order: [[ 0, 'desc' ]],
+              deferRender: !0,
+              scrollY: "auto",
+              scrollCollapse: !0,
+              scroller: 0,
+              responsive: !0,
+              destroy: true,
+              "aaData": aaData
+            })
+
+          })
+        
+        
+
+        function htmlFn(uid){
+          return '<a onclick="_edit(\''+ uid +'\')" href="javascript:;" class="btn btn-sm btn-primary" style="margin-bottom: 5px;">編輯</a> <a href="javascript:;" onclick="_delete(\''+ uid +'\')"  class="btn btn-sm btn-success" style=" margin-bottom: 5px;">刪除</a>'
+        }
+        
+        
+      }
+      
+      $(function(){
+        firebase.auth().onAuthStateChanged(function(user) {
+          $(".dataTables_empty").html("loading...")
+          loadData();
+        })
+      })
+
+    </script>
+</head>
+<body>
+
+<!--<div id="page-loader" class="fade in"><span class="spinner"></span></div>-->
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%include include/user%>
+				<%include include/nav%>
+			</div>
+		</div>
+		
+	<div class="sidebar-bg"></div>
+	
+
+  <div class="content">
+
+			<h1 class="page-header"><%= title%>
+			<button onclick="new_admin()" class="btn m-l-5 m-b-5 btn-success btn-sm pull-right">新增管理者 </button>
+            <small>網站登入成員管理</small>
+			</h1>
+			<div class="row">
+			  <div class="col-md-7">
+                    <div class="panel panel-inverse">
+                       <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            </div>
+                            <h4 class="panel-title">用戶列表</h4>
+                      </div>
+                       <div class="panel-body">
+                            <table id="data-table" class="table table-striped table-bordered" >
+                                <thead>
+                                    <tr>
+                                        <th class="timeTable" style="width:40px;">更新時間</th>
+                                        <th>帳號</th>
+                                        <th>姓名</th>
+                                        <th>權限</th>
+                                        <th>備註</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+ 				<div id="content" class="col-md-5">
+					 
+ 					 <div class="panel panel-inverse">
+ 					 	<div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            </div>
+                            <h4 id="new_member" class="panel-title">新增管理者</h4>
+                          </div>
+						 <div class="panel-body panel-form">
+						 <form id="myForm" class="form-horizontal form-bordered" method="post" action="/admin/memberManage">
+                                    <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3">帳號 :</label>
+                                      <div class="col-md-8 col-sm-8">
+                                          <input id="uid" name="uid" class="form-control" type="text" placeholder="填寫email" maxlength="80" />
+                                          <div id="uid_txt" style="margin-top:5px;display:none;">要修改帳號，請先刪除此帳號在做新增</div>
+                                      </div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-3 col-sm-3">姓名 :</label>
+										<div class="col-md-8 col-sm-8">
+											<input id="name" name="name"  class="form-control" type="text" placeholder="顯示姓名" />
+										</div>
+									</div>
+
+
+                                    <div class="form-group index" >
+                                    <label class="control-label col-md-3 col-sm-3">權限 :</label>
+                                    <div class="col-md-7 col-sm-7">
+                                      <div class="clearfix">
+                                         <div class="checkbox"><label onclick="r_click()">
+                                           <input id="r_最高管理者" type="checkbox" name="root" value="最高管理者">最高管理者</label>
+                                         </div>
+                                      </div>
+                                      <hr style="margin-top:15px;margin-bottom:5px;">
+                                     <div class="clearfix">
+                                        <div class="checkbox"><label><input type="checkbox" id="r_網站管理者" name="root" value="網站管理者">網站管理者</label></div>
+                                     </div>
+                                     <div class="clearfix">
+                                        <div class="checkbox"><label><input type="checkbox" id="r_文章管理者" name="root" value="文章管理者">文章管理者</label></div>
+                                     </div>
+                                     <div class="clearfix">
+                                        <div class="checkbox"><label><input type="checkbox" id="r_產品管理者" name="root" value="產品管理者">產品管理者</label></div>
+                                     </div>
+                                     <div class="clearfix">
+                                        <div class="checkbox"><label><input type="checkbox" id="r_訂單管理者" name="root" value="訂單管理者">訂單管理者</label></div>
+                                     </div>
+                                    </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3">密碼 :</label>
+                                      <div class="col-md-8 col-sm-8">
+                                        <input type="text" name="password" id="password-indicator-default" maxlength="20" class="form-control m-b-5" />
+                                        <div id="passwordStrengthDiv" class="is0 m-t-5"></div>
+                                        <div style="margin-top:5px;">(本網站密碼都經過雜湊處理，管理者也無法得知使用者密碼，敬請安心使用)</div>
+                                      </div>
+                                    </div>
+                                    <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3">備註 :</label>
+                                      <div class="col-md-8 col-sm-8">
+                                        <textarea id="note" name="note" class="textarea_use form-control" rows="5"></textarea>
+                                      </div>
+                                    </div>
+									<div class="form-group">
+                                      <div class="col-md-12 col-sm-12" style="text-align:center">
+                                          <button id="edit_button" onclick="_clear()" type="button" style="margin-left:10px;display:none" class="btn btn-white m-r-5">取消編輯</button>
+                                          <button onclick="formSubmit()" type="button" class="submit_button btn btn-primary" style="display:inline-block">送出</button>
+                                      </div>
+									</div>
+									
+									<input id="member_edit" name="member_edit" type="hidden">
+						   </form>
+						</div>
+					</div>
+ 				</div>
+      </div>
+	</div>
+
+  <%include include/scroll_top%>
+
+</div>
+
+
+<script src="<%=coloradmin%>plugins/ionRangeSlider/js/ion-rangeSlider/ion.rangeSlider.min.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="<%=coloradmin%>plugins/masked-input/masked-input.min.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/password-indicator/js/password-indicator.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+<script src="<%=coloradmin%>js/form-plugins.demo.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/DataTables/media/js/jquery.dataTables.js"></script>
+<script src="<%=coloradmin%>plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+<script src="<%=coloradmin%>plugins/DataTables/extensions/Scroller/js/dataTables.scroller.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+
+<script src="<%=coloradmin%>js/apps.min.js"></script>
+
+
+<script>
+  var is_submit = false
+  $("#data-table").DataTable({
+    lengthMenu: [50, 100, 200]
+  })
+  $(".dataTables_empty").html("loading...");
+  
+  
+  var vm = new Vue({
+    el: '#content',
+    data: {
+      teacher: {}
+    },
+    mounted: function(){},
+    computed: {
+    },
+    methods: {
+     file_change: file_change
+   }
+ })
+  
+  
+  function set_is_submit(val){
+    is_submit = val;
+    $(".submit_button").prop('disabled', is_submit);
+    $(".submit_button").html("送出")
+    if(is_submit){
+      $(".submit_button").html("送出中…")
+    }
+  }
+  function _edit(uid){
+    if(is_submit) return ;
+    for(var i=0;i<member_data.length;i++){
+
+      if(member_data[i][0] == uid){
+        $("#edit_button").show()
+        $("#name").val(member_data[i][1]);
+        $("#uid").val(member_data[i][0]);
+//        $("#uidType").val(member_data[i][2]);
+        $("#note").val(member_data[i][3]); 
+        $("#password-indicator-default").val(member_data[i][4]);
+        $("#link").val(member_data[i][5]); 
+        // vm.teacher = member_data[i][6];
+        
+        var root = member_data[i][2]
+          $(".checkbox input").prop('checked', false).removeAttr("disabled");
+                                      
+        if(root=="最高管理者"){
+          $("#r_最高管理者").prop('checked',true)
+           r_click()
+        }else{
+          var root = root.toString().split(",") ; //變陣列
+          for(var i=0;i<root.length;i++){
+            $("#r_"+root[i]).prop('checked', true);
+          }
+        }
+        
+        $("#new_member").html('編輯用戶 <button style="margin-left:10px;margin-right:10px; padding: 3px 10px;" onclick="_clear()" class="btn btn-sm btn-white">取消編輯</button><button onclick="formSubmit()" type="button" class="submit_button btn btn-sm btn-primary" style="display:inline-block;padding: 3px 10px;">送出</button>') 
+        $("#member_edit").val($("#uid").val());
+        $("#uid").attr("readonly",true);
+        $("#uid_txt").show()
+        return
+      }
+    } 
+  }
+  function _delete(uid){
+    if(is_submit) return
+    if(!window.confirm("確定要刪除資料?")) return;
+    if(is_submit) return
+    set_is_submit(true);
+     $.ajax({
+       type: "POST",
+       url: "/admin/memberManageDelete?uid=" + uid,
+       success: function(data){
+         set_is_submit(false);
+         loadData();
+         _clear()
+       }
+     });
+  }
+  function formSubmit(){
+     if(is_submit) return
+      //檢查欄位
+     if($("#uid").val() == ""){
+       return alert("請填寫帳號")
+     }
+     if($("#uid").val().indexOf("@") == -1){
+       return alert("帳號格式錯誤(必需是 email)")
+     }
+    
+    if($("#new_member").html() == "新增管理者") {
+      if($("#password-indicator-default").val().length==0){
+         return alert("請輸入密碼")
+      }
+      if($("#password-indicator-default").val().length < 6){
+         return alert("密碼太短")
+      }
+    }else{
+      if($("#password-indicator-default").val().length > 0 &&  $("#password-indicator-default").val().length < 6){
+         return alert("密碼太短")
+      }
+    }
+
+     set_is_submit(true);
+
+     $.ajax({
+       type: "POST",
+       url: "/admin/memberManage",
+       data: $("#myForm").serialize(),
+       success: function(data){
+         set_is_submit(false);
+         loadData();
+         if(data == "ok") return _clear();
+       },
+        error:function(XMLHttpRequest, textStatus){
+            console.log(XMLHttpRequest);
+        }
+     });
+  }
+  
+  function _clear(){
+    if(is_submit) return
+    $("#name").val("");
+    $("#uid").val("");
+    $("#uidType").val("");
+    $("#note").val(""); 
+    $("#link").val(""); 
+    $("#password-indicator-default").val("");
+    $("#new_member").html("新增管理者");
+    $("#member_edit").val("")
+    $("#edit_button").hide();
+    //vm.teacher = {}
+    $("#uid").attr("readonly",false)
+    $("#uid_txt").hide()
+    
+    $(".checkbox input").prop('checked', false).removeAttr("disabled");
+
+  }
+  function r_click(){
+    if($("#r_最高管理者").prop('checked')){
+      $(".checkbox input:not(#r_最高管理者)").prop('checked',true);
+      $(".checkbox input:not(#r_最高管理者)").attr("disabled","disabled");
+    }else{
+      $(".checkbox input:not(#r_最高管理者)").removeAttr("disabled")
+    }
+  }
+  $(document).ready(function() {
+    App.init();
+    FormPlugins.init();
+  });
+  function new_admin(){
+    _clear()
+    $("#uid").focus();
+  }
+  
+  $("#button_use").append('<button onclick="new_admin()" class="btn m-l-5 m-b-5 btn-success btn-sm">新增管理者 </button>')
+  $("#button_use").hide();
+    $(window).scroll(nav_scroll);
+  function nav_scroll(){
+    var _scroll_top=$("#header").offset().top;
+      if(_scroll_top > 100){
+        $("#button_use").show();
+      }else{
+        $("#button_use").hide()
+      }
+      return
+  }    
+  
+  function timestampToDate(timestamp){
+    var date = new Date(timestamp * 1000);
+      var mm = date.getMonth() + 1; 
+      var dd = date.getDate();
+      return [date.getFullYear(),
+            (mm>9 ? '' : '0') + mm,
+            (dd>9 ? '' : '0') + dd
+           ].join('/');
+  } 
+
+</script>
+</body>
+</html>

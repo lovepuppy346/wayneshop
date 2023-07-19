@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        <%=headerTitle%> | <%= title%>
+    </title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+    <link href="<%=coloradmin%>plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/powerange/powerange.min.css" rel="stylesheet" />
+    <%include include/all %>
+        <style>
+            .fa-2x {
+                font-size: 1.5em;
+            }
+        </style>
+</head>
+
+<body>
+
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+    <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+        <%include include/header %>
+            <div id="sidebar" class="sidebar">
+                <div data-scrollbar="true" data-height="100%">
+                    <%include include/user%>
+                        <%include include/nav%>
+                </div>
+            </div>
+
+            <div class="sidebar-bg"></div>
+
+            <div id="content" class="content">
+                <h1 class="page-header">
+
+                    <span>
+                        <%= title%>
+                    </span>
+
+                </h1>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-inverse">
+                            <div class="panel-heading">
+                                <div class="panel-heading-btn">
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
+                                        data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                        data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                </div>
+                                <h4 class="panel-title">
+                                    <button id="new" @click="new_data()" style="margin-right: 15px;" type="button"
+                                        class="btn btn-success m-r-5 m-b-5 btn-sm">新增主分類</button>
+                                    <button id="cancel_save" @click="cancel_save()" style="display:none;" type="button"
+                                        class="btn btn-white m-r-5 m-b-5 btn-sm">取消儲存</button>
+                                    <button id="save" disabled="disabled" type="button" @click="save_data()"
+                                        class="btn btn-primary m-r-5 m-b-5 btn-sm">儲存</button>
+                                </h4>
+                            </div>
+
+                            <div class="alert alert-success fade in">
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span aria-hidden="true">
+                                        <font style="vertical-align: inherit;">
+                                            <font style="vertical-align: inherit;">×</font>
+                                        </font>
+                                    </span>
+                                </button>
+                                <font style="vertical-align: inherit;">
+                                    <font style="vertical-align: inherit;">
+                                        本分類架構可用在任何兩個層級的資料</font>
+                                </font><br>
+                                <font style="vertical-align: inherit;">
+                                    <font style="vertical-align: inherit;">
+
+                                    </font>
+                                </font>
+                            </div>
+
+
+                            <div class="panel-body">
+                                <div id="wizard">
+                                    <div class="row" style="padding-top:15px">
+                                        <div class="col-md-1">
+                                            <label>編號</label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>名稱</label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>顏色</label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>說明</label>
+                                        </div>
+                                        <div class="col-md-1" style="text-align: center;">
+                                            <label>排序</label>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <label>開關</label>
+                                        </div>
+                                        <div class="col-md-1">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div v-show="item.sort != -9999" style="padding-top:5px;"
+                                        v-for="(item, index) in pageClassMain_sort">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <input v-model.trim="item.id" maxlength="7" type="text"
+                                                    class="form-control" disabled placeholder="填寫編號" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input v-model.trim="item.name" maxlength="30" type="text"
+                                                    class="form-control" placeholder="填寫分類名稱" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input style="border: 2px solid;" :style="{ borderColor: item.color }"
+                                                    v-model.trim="item.color" maxlength="15" type="text"
+                                                    class="form-control" placeholder="顏色代碼" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <textarea v-model.trim="item.introduction" class="form-control" rows="4"
+                                                    placeholder="填寫說明"></textarea>
+                                                <Metro style="margin-top:10px;" @up2="up2" @down2="down2"
+                                                    @new_data2="new_data2" @delete_data2="delete_data2" :index="index"
+                                                    :metro="item.productClass"></Metro>
+                                            </div>
+                                            <div class="col-md-1" style="text-align: center;">
+                                                <a v-if="index>0 && item.sort>1" @click="up(index)"
+                                                    href="javascript:void(0)"><i class="fa fa-2x fa-arrow-up"></i></a>
+                                                <a v-if="index<pageClassMain_sort.length-1" @click="down(index)"
+                                                    href="javascript:void(0)"><i class="fa fa-2x fa-arrow-down"></i></a>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <input :id="'switchery'+index" type="checkbox" data-render="switchery"
+                                                    data-theme="black" v-model="item.checked" />
+
+                                            </div>
+                                            <div class="col-md-1">
+                                                <a @click="delete_data(index)" class="btn btn-warning"
+                                                    role="button">刪除</a>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12" style="text-align:center">
+                                            <button onclick="new_data()" style="margin-right: 15px;" type="button"
+                                                class="btn btn-success m-r-5 m-b-5 new">新增分類</button>
+                                            <button @click="cancel_save()" style="display:none;" type="button"
+                                                class="btn btn-defautl m-r-5 m-b-5 cancel_save">取消儲存</button>
+                                            <button disabled="disabled" type="button" @click="save_data()"
+                                                class="btn btn-primary m-r-5 m-b-5 save">儲存</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%include include/scroll_top%>
+            </div>
+    </div>
+    <script src="<%=coloradmin%>plugins/switchery/switchery.min.js"></script>
+    <script src="<%=coloradmin%>plugins/powerange/powerange.min.js"></script>
+    <script src="<%=coloradmin%>js/form-slider-switcher.demo.min.js"></script>
+    <script src="<%=coloradmin%>js/apps.min.js"></script>
+    <script>
+        //<input v-model="item2.id" style="margin-bottom:10px;" type="text" class="form-control" placeholder="code" disabled />
+        const Metro = {
+            template: `
+      <div>
+        <div v-for="(item2, index2) in metro_sort" class="row">
+          <div class="col-md-5">
+            <input v-model="item2.name" style="margin-bottom:10px;" type="text" class="form-control" placeholder="填寫子分類名稱" />
+          </div>
+          <div class="col-md-2">
+            <a v-if="index2>0" @click="up2(index2)" href="javascript:void(0)"><i class="fa fa-arrow-up"></i></a>
+            <a v-if="index2 < metro_sort.length-1" @click="down2(index2)" href="javascript:void(0)"><i class="fa fa-arrow-down"></i></a>
+          </div>
+          <div class="col-md-3">
+             <div class="checkbox" style="margin-top:0"><label><input type="checkbox" v-model="item2.checked" >開關</label></div>
+          </div>
+          <div class="col-md-1">
+             <a @click="delete_data2(index2)" class="btn btn-default btn-sm" role="button">刪除</a>
+          </div>
+       </div>
+       <button id="new2" @click="new_data2" style="margin-right: 15px;" type="button" class="btn btn-inverse m-r-5 m-b-5 btn-sm">新增子分類</button>
+      </div>
+    `,
+            props: ['metro', "index"],
+            data: function () { },
+            computed: {
+                metro_sort: function () {
+                    var _sort = this.metro;
+                    _sort = _sort.sort(function (a, b) {
+                        if (a.sort > b.sort) return 1; //照sort
+                        return -1;
+                    });
+                    return _sort;
+                },
+            },
+            methods: {
+                delete_data2: function (index2) {
+                    this.$emit('delete_data2', {
+                        index: this.index,
+                        index2: index2
+                    });
+                },
+                new_data2: function () {
+                    this.$emit('new_data2', {
+                        index: this.index
+                    });
+                },
+                up2: function (index2) {
+                    this.$emit('up2', { index: this.index, index2: index2 });
+                },
+                down2: function (index2) {
+                    this.$emit('down2', { index: this.index, index2: index2 });
+                }
+
+            }
+        };
+
+        var vm = new Vue({
+            el: '#content',
+            data: {
+                pageClassMain:  <%- data %>,
+                delete_id_main: [],
+                delete_id: []
+            },
+            components: {
+                Metro,
+            },
+            computed: {
+                pageClassMain_sort: function () {
+                    var _sort = this.pageClassMain;
+                    _sort = _sort.sort(function (a, b) {
+                        if (a.sort > b.sort) return 1; //照sort
+                        return -1;
+                    });
+                    return _sort;
+                },
+            },
+            methods: {
+                up: function (index) {
+                    if (this.pageClassMain[index].sort <= 1) return;
+
+                    var sort = this.pageClassMain[index].sort;
+                    var sort2 = this.pageClassMain[index - 1].sort;
+                    this.pageClassMain[index].sort = sort2;
+                    this.pageClassMain[index - 1].sort = sort;
+
+                    vm.set_save();
+                    vm.set_all();
+                },
+                down: function (index) {
+                    var sort = this.pageClassMain[index].sort;
+                    var sort2 = this.pageClassMain[index + 1].sort;
+                    this.pageClassMain[index].sort = sort2;
+                    this.pageClassMain[index + 1].sort = sort;
+
+                    vm.set_save();
+                    vm.set_all();
+                },
+                up2: function (data) {
+                    var index = data.index;
+                    var index2 = data.index2;
+                    var sort = this.pageClassMain[index].productClass[index2].sort;
+                    var sort2 = this.pageClassMain[index].productClass[index2 - 1].sort;
+
+                    this.pageClassMain[index].productClass[index2].sort = sort2;
+                    this.pageClassMain[index].productClass[index2 - 1].sort = sort;
+
+                    vm.set_save();
+                    vm.set_all();
+                },
+                down2: function (data) {
+                    var index = data.index;
+                    var index2 = data.index2;
+                    var sort = this.pageClassMain[index].productClass[index2].sort;
+                    var sort2 = this.pageClassMain[index].productClass[index2 + 1].sort;
+
+                    this.pageClassMain[index].productClass[index2].sort = sort2;
+                    this.pageClassMain[index].productClass[index2 + 1].sort = sort;
+
+                    vm.set_save();
+                    vm.set_all();
+                },
+                delete_data2: function (data) {
+                    if (!window.confirm("確定要刪除資料 ! (必需按下儲存送出後，資料才會刪除。)")) return
+                    var index = data.index;
+                    var index2 = data.index2;
+
+                    vm.delete_id.push(vm.pageClassMain[index].productClass[index2].id);//刪除的資料
+
+                    vm.pageClassMain[index].productClass.splice(index2, 1);
+                    vm.set_save();
+                    vm.set_all();
+                    for (var i = 0; i < vm.pageClassMain[index].productClass.length; i++) {
+                        vm.pageClassMain[index].productClass[i].sort = i + 1;
+                    }
+
+                },
+                delete_data: function (index) {
+                    if (!window.confirm("確定要刪除資料 ! (必需按下儲存送出後，資料才會刪除。)")) return
+                    vm.pageClassMain[index].sort = -9999;
+                    vm.set_save();
+                    vm.set_all();
+                    var j = 0;
+                    for (var i = 0; i < vm.pageClassMain.length; i++) {
+                        if (vm.pageClassMain[i].sort > 0) {
+                            j = j + 1;
+                            vm.pageClassMain[i].sort = j
+                        }
+                    }
+
+                    vm.delete_id_main.push(vm.pageClassMain[index].id);//刪除的資料
+                },
+                save_data: async function (fn) {
+                    //檢查 name 是否有填
+                    var pageClassMain = JSON.parse(JSON.stringify(vm.pageClassMain));
+                    pageClassMain = pageClassMain.filter(i => i.sort != -9999)
+                    var _array = [];
+                    var _array2 = [];
+                    var _array3 = []
+                    for (var i = 0; i < pageClassMain.length; i++) {
+                        if (pageClassMain[i].name == "") return alert("分類名稱必填")
+                        if (pageClassMain[i].id == "") return alert("編號必填")
+                        _array.push(pageClassMain[i].name);
+                        pageClassMain[i].id = pageClassMain[i].id
+                        _array2.push(pageClassMain[i].id);
+                        pageClassMain[i].sort = i + 1;
+                        for (var j = 0; j < pageClassMain[i].productClass.length; j++) {
+                            if (pageClassMain[i].productClass[j].code == "") return alert("編號必填")
+                            pageClassMain[i].productClass[j].sort = j + 1;
+                            _array3.push(pageClassMain[i].productClass[j].id);
+                        }
+                    }
+                    if (hasDuplicates(_array)) return alert("分類名稱不能重複")
+                    if (hasDuplicates(_array2)) return alert("編號不能重複")
+                    if (hasDuplicates(_array3)) return alert("子分類不能重複")
+
+                    //儲存分類資料
+                    $.post("/admin/productClass", {
+                        data: JSON.stringify(pageClassMain),
+                        delete_id: JSON.stringify(vm.delete_id),
+                        delete_id_main: JSON.stringify(vm.delete_id_main)
+                    }, function (data) {
+                        location.reload();
+                    })
+
+                },
+
+                new_data: function () {
+                    var id = generateSerial(6);
+                    check_id(id);
+                    function check_id(id) {
+                        for (var i = 0; i < vm.pageClassMain.length; i++) {
+                            if (vm.pageClassMain[i].id == id) {
+                                id = generateSerial(6)
+                                return check_id(id)
+                            }
+                        }
+                    }
+
+                    vm.pageClassMain.push({
+                        id: id,
+                        name: "",
+                        color: "#000",
+                        introduction: "",
+                        checked: false,
+                        productClass: [],
+                        sort: vm.pageClassMain.length + 1,
+                    });
+                    vm.set_save();
+                    setTimeout(function () {
+                        renderSwitcher2("#switchery" + (vm.pageClassMain.length - 1))
+                    }, 0)
+                },
+                new_data2: function (data) {
+                    var index = data.index;
+                    var id = vm.pageClassMain[index].id + generateSerial(5);
+                    check_id(id);
+                    function check_id(id) {
+                        for (var i = 0; i < vm.pageClassMain[index].productClass.length; i++) {
+                            if (vm.pageClassMain[index].productClass.id == id) {
+                                id = vm.pageClassMain[index].id + generateSerial(5)
+                                return check_id(id)
+                            }
+                        }
+                    }
+
+                    vm.pageClassMain[index].productClass.push({
+                        id: id,
+                        name: "",
+                        checked: false,
+                        sort: vm.pageClassMain[index].productClass.length + 1
+                    });
+                    vm.set_save();
+                },
+                cancel_save: function () {
+                    location.reload();
+                },
+                set_save: function (a) {
+                    if (a) {
+                        $('#save,.save').attr("disabled", "disabled");
+                        $("#cancel_save,.cancel_save").hide();
+                        //          $('#new ,.new').removeAttr("disabled");
+                    } else {
+                        $('#save,.save').removeAttr("disabled");
+                        $("#cancel_save,.cancel_save").show()
+                        //          $('#new ,.new').attr("disabled","disabled");
+                    }
+                },
+                set_all: function () {
+                    setTimeout(function () {
+                        $(".switchery").trigger("click").trigger("click");
+                    }, 0)
+                }
+            }
+        })
+        $(function () {
+            $('input,textarea').on("change input", function () {
+                vm.set_save();
+            })
+        })
+        $(document).ready(function () {
+            App.init();
+            FormSliderSwitcher.init();
+        });
+
+        //上方按鈕置頂
+        function save_data() {
+            vm.save_data()
+        }
+        function cancel_save() {
+            vm.cancel_save()
+        }
+        function new_data() {
+            vm.new_data()
+        }
+        $("#button_use").append('<button onclick="new_data()" style="margin-right: 15px;" type="button" class="btn btn-success m-r-5 m-b-5 btn-sm new">新增主分類</button><button onclick="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save">取消儲存</button><button disabled="disabled" type="button" onclick="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>')
+        $("#button_use").hide();
+        $(window).scroll(nav_scroll);
+        function nav_scroll() {
+            var _scroll_top = $("#header").offset().top;
+            if (_scroll_top > 100) {
+                $("#button_use").show();
+            } else {
+                $("#button_use").hide()
+            }
+            return
+        }
+        function hasDuplicates(array) {
+            var valuesSoFar = Object.create(null);
+            for (var i = 0; i < array.length; ++i) {
+                var value = array[i];
+                if (value in valuesSoFar) {
+                    return true;
+                }
+                valuesSoFar[value] = true;
+            }
+            return false;
+        }
+        function generateSerial(length) {
+            var chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                serialLength = length,
+                randomSerial = "",
+                i,
+                randomNumber;
+            for (i = 0; i < serialLength; i = i + 1) {
+                randomNumber = Math.floor(Math.random() * chars.length);
+                randomSerial += chars.substring(randomNumber, randomNumber + 1);
+            }
+            return randomSerial
+        }
+
+    </script>
+
+</body>
+
+</html>

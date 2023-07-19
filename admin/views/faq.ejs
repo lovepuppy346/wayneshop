@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="utf-8" />
+	<title><%=headerTitle%> | <%= title%></title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+	<link href="<%=coloradmin%>plugins/switchery/switchery.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/powerange/powerange.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+  
+    <%include include/froalaeditor_css %>
+
+	<%include include/all %>
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%include include/user%>
+				<%include include/nav%>
+			</div>
+		</div>
+		
+<div class="sidebar-bg"></div>
+
+<div id="content" class="content">
+			<h1 class="page-header"><%= title%></h1>
+			<div class="row">
+			    <div class="col-md-12">
+            <div class="panel panel-inverse">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    </div>
+                    <h4 class="panel-title">
+                    <span style="margin-right: 15px;">FAQ 列表</span>
+                       <button id="cancel_save" @click="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm">取消儲存</button>
+                        <button id="save" disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm">儲存</button>
+                        <button id="new" @click="new_data()" type="button" class="btn btn-success m-r-5 m-b-5 btn-sm">新增一筆資訊</button>
+                    </h4>
+                </div>
+                <div class="alert alert-info fade in" style="margin-bottom:0;border-radius:0">
+                   <font style="vertical-align: inherit;">
+                     <i class="fa fa-info-circle fa-lg m-r-5 pull-left m-t-2"></i>
+                       顯示於網站<b>常見問題</b>下方的清單
+                   </font>
+                   <span class="close" data-dismiss="alert" style="font-size:16px;">×</span>
+                 </div>
+              <div class="panel-body">
+              
+                 <div class="row col-md-12">     
+                    
+                         <div class="form-horizontal">
+                                      <div class="form-group">
+                                        <label class="col-md-3 control-label">常見問題說明</label>
+                                        <div class="col-md-6">
+                                          <textarea v-model="index_faq.text" class="form-control"  rows="3">{{index_faq.text}}</textarea>
+                                          <div style="margin-top:5px">這個欄位可使用 html</div>
+                                          
+                                        </div>
+                                     </div>
+                                </div>
+                       <hr>
+                 </div>
+                
+               <div style="padding-top:5px;" v-for="(item, index) in index_faq_sort">
+                         <div class="row col-md-12">
+                                <div class="form-horizontal">
+                                      <div class="form-group">
+                                        <label class="col-md-3 control-label">問題</label>
+                                        <div class="col-md-6">
+                                          <input type="text" v-model="item.name" class="form-control" placeholder="填寫問題" />
+                                        </div>
+                                         <div class="col-md-1">
+                                           <a @click="delete_data(index)" class="btn btn-warning" role="button">刪除</a>
+                                        </div>
+                                         <div class="col-md-1">
+                                           <a v-if="index>0" @click="up(index)" href="javascript:void(0)"><i class="fa fa-2x fa-arrow-up"></i></a>
+                                           <a v-if="index<index_faq_sort.length-1" @click="down(index)" href="javascript:void(0)"><i class="fa fa-2x fa-arrow-down"></i></a>
+                                        </div>
+                                     </div>
+                                </div>
+                                <div class="form-horizontal">
+                                      <div class="form-group">
+                                        <label class="col-md-3 control-label">回答</label>
+                                        <div class="col-md-6">
+                                          <textarea v-model="item.text" :id="'a_text'+index" class="textarea_use form-control" style="margin-top: 10px;"  rows="5">{{item.text}}</textarea>
+                                        </div>
+                                     </div>
+                                </div>
+                                 <hr>
+                         </div>
+                        
+                </div>
+            </div>
+                   
+         </div>
+       </div>
+		</div>
+  <%include include/scroll_top%>
+</div>
+</div>
+<script src="<%=coloradmin%>plugins/switchery/switchery.min.js"></script>
+<script src="<%=coloradmin%>plugins/powerange/powerange.min.js"></script>
+<script src="<%=coloradmin%>js/form-slider-switcher.demo.min.js"></script>
+
+<%include include/froalaeditor_js%>
+
+<script src="<%=coloradmin%>js/apps.min.js"></script>
+	
+<script>
+  var vm = new Vue({
+    el: '#content',
+    data:{
+      index_faq: <%-data%>
+    },
+    computed: {
+      index_faq_sort: function () {
+        var _sort=this.index_faq.content;
+      if(_sort == undefined) return false;
+          _sort = _sort.sort(function (a, b) {
+            if (a.sort > b.sort) return 1; //照sort
+            return -1;
+          });
+          return _sort;
+      }
+    },
+    methods: {
+      file_change: file_change,
+      up: function(index){
+         this.index_faq.content[index].sort=this.index_faq.content[index].sort-1;
+        this.index_faq.content[index-1].sort=this.index_faq.content[index-1].sort+1;
+        vm.set_save();
+        vm.set_all();
+      },
+      down: function(index){
+        this.index_faq.content[index].sort=this.index_faq.content[index].sort+1;
+        this.index_faq.content[index+1].sort=this.index_faq.content[index+1].sort-1;
+        vm.set_save();
+        vm.set_all();
+      },
+      delete_data: function(index){
+     if(!window.confirm("確定要刪除資料 ! (必需按下儲存送出後，資料才會刪除。)"))return
+        vm.index_faq.content.splice(index, 1);
+        vm.set_save();
+        vm.set_all();
+        for(var i=0;i<vm.index_faq.content.length;i++){
+          vm.index_faq.content[i].sort=i+1;
+        }
+      },
+      new_data:function(){
+        vm.index_faq.content.push({
+          name:"",
+          link:"",
+          img:"",
+          sort : vm.index_faq.content.length + 1
+        });
+       vm.save_data();
+        
+      },
+      save_data: function(){
+        var t_data=JSON.parse(JSON.stringify(vm._data));
+        for(var i=0;i<t_data.index_faq.content.length;i++){
+          t_data.index_faq.content[i].sort=i+1;
+        }
+
+        $.post("/admin/faq", {
+          data : JSON.stringify(t_data.index_faq)
+        },function(data){
+          location.reload();
+        })
+
+
+      },
+      cancel_save:function(){
+        location.reload();
+      },
+      set_save: function(a){
+        if(a){
+          $('#save,.save').attr("disabled","disabled");
+          $("#cancel_save,.cancel_save").hide();
+          $('#new ,.new').removeAttr("disabled");
+        }else{
+          $('#save,.save').removeAttr("disabled");
+          $("#cancel_save,.cancel_save").show()
+          $('#new ,.new').attr("disabled","disabled");
+        }
+      },
+
+      set_all: function(){
+        setTimeout(function(){
+          $(".switchery").trigger("click").trigger("click");
+          for(var i=0;i<vm.index_faq.content.length;i++){
+            $("#a_text"+i).froalaEditor('html.set',vm.index_faq.content[i].text);
+          }
+        },0)
+      },
+    }
+  })
+
+  $(function(){
+    $('input,textarea').on("change input",function(){
+      vm.set_save();
+    })
+  })
+  
+  
+    //froala-editor編輯器程式碼
+  $(function() {
+    $('.textarea_use').froalaEditor({
+       heightMin: 300,
+       heightMax: 600,
+      <%include include/froalaeditor_tool_3%>
+    }).on('froalaEditor.contentChanged', function (e, editor) {
+      var id=e.target.id;
+      vm.index_faq.content[id.split("a_text")[1]].text = $(e.target).froalaEditor('html.get');
+      vm.set_save();
+    });
+  });
+   
+
+  $(document).ready(function() {
+    App.init();
+  });
+
+ //上方按鈕置頂
+  function save_data(){
+    vm.save_data();
+  }
+  function cancel_save(){
+    vm.cancel_save();
+  }
+  $("#button_use").append('<button onclick="cancel_save()" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save" style="display:none;">取消儲存</button><button disabled="disabled" type="button" onclick="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button><button @click="new_data()" type="button" class="btn btn-success m-r-5 m-b-5 btn-sm new">新增一筆資訊</button')
+  $("#button_use").hide();
+  $(window).scroll(nav_scroll);
+  function nav_scroll(){
+    var _scroll_top=$("#header").offset().top;
+      if(_scroll_top > 100){
+        $("#button_use").show();
+      }else{
+        $("#button_use").hide()
+      }
+      return
+  }
+
+
+</script>
+	
+</body>
+</html>

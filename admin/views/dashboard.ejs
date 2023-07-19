@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="utf-8" />
+	<title><%=headerTitle%> | <%= title%></title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+	<link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+    <% include include/all%>	
+
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%include include/user%>
+				<%include include/nav%>
+			</div>
+		</div>
+		
+	<div class="sidebar-bg"></div>
+		
+
+		<!-- begin #content -->
+		<div id="content" class="content">
+
+       <h1 class="page-header">管理主頁</h1>
+      <div class="profile-container">
+               <div class="profile-section">
+                    <div class="profile-left">
+
+                       <%if(session._picture){%>
+                        <div class="profile-image" style="background-image: url(<%=session._picture%>);background-size: cover;background-repeat: no-repeat;background-position: 50%;">
+                            <i class="fa fa-user hide"></i>
+                        </div>
+                        <%}else{%>
+                         <div class="profile-image" style="background-image: url( <%=coloradmin%>img/user-13.jpg);background-size: cover;background-repeat: no-repeat;">
+                            <i class="fa fa-user hide"></i>
+                        </div>
+                        <%}%>
+                        <div class="m-b-10">
+                           <form enctype="multipart/form-data" method="post">
+                             <span class="btn btn-info fileinput-button">
+                                  <i class="fa fa-plus"></i>
+                                  <span v-if="is_upload_loading_txt">{{is_upload_loading_txt}}</span>
+                                  <span v-else>更換照片</span>
+                                  <input id="files" @change="file_change($event,'files')"  type="file" class="files" name="files" accept="image/png,image/gif,image/jpg,image/jpeg"  >
+                              </span>
+                           </form>
+                        </div>
+          
+                    </div>
+                    <div class="profile-right">
+                        <div class="profile-info">
+                            <div class="table-responsive">
+                                <table class="table table-profile">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>
+                                                <h4><%=session._name%></h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr class="highlight">
+                                            <td class="field">登入帳號</td>
+                                            <td><%=session._email%></td>
+                                        </tr>
+                                        <tr class="highlight">
+                                            <td class="field">密碼</td>
+                                            <td><input id="password" type="password" value="這是亂打的啦-.-"> <a style="position: relative;
+    top: -2px;margin-left:5px" onclick="set_password()" href="javascript:;" class="btn btn-success btn-xs">重設密碼</a></td>
+                                        </tr>
+                                       
+                                        <tr class="highlight">
+                                            <td class="field">管理權限</td>
+                                            <td><%-session._root || "沒有權限"%></td>
+                                        </tr>
+                                       
+                                        <tr class="divider">
+                                            <td colspan="2"></td>
+                                        </tr>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+		</div>
+		
+		<div  style="margin-top: 20px;">
+		  <div class="row">
+		    <div class="col-md-6">
+		         <div class="panel-group" id="accordion">
+						<div class="panel panel-inverse overflow-hidden">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									<a class="accordion-toggle accordion-toggle-styled" >
+									    <i class="fa fa-plus-circle pull-right"></i> 
+										網站公告
+									</a>
+								</h3>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse" style="display: block!important;">
+								<div class="panel-body">
+									wayne1894 教學網 - 購物車後台範例
+								</div>
+							</div>
+						</div>
+            </div>
+             
+             
+		    </div>
+		     <div class="col-md-6">
+		       <div class="panel panel-inverse" data-sortable-id="index-8">
+						<div class="panel-heading">
+							<div class="panel-heading-btn">
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+								<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+							</div>
+							<h4 class="panel-title">待辦事項</h4>
+						</div>
+						<div class="panel-body p-0">
+							<ul class="todolist">
+                               <li class="active">
+									<a href="javascript:;" class="todolist-container active" data-click="todolist">
+										<div class="todolist-input"><i class="fa fa-square-o"></i></div>
+										<div class="todolist-title">課程後台管理系統</div>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="todolist-container active" data-click="todolist">
+										<div class="todolist-input"><i class="fa fa-square-o"></i></div>
+										<div class="todolist-title">產品管理</div>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;" class="todolist-container" data-click="todolist">
+										<div class="todolist-input"><i class="fa fa-square-o"></i></div>
+										<div class="todolist-title">訂單管理</div>
+									</a>
+								</li>
+							
+							</ul>
+						</div>
+					</div>
+		     </div>
+		  </div>
+		</div>
+
+  <%include include/scroll_top%>
+
+</div>
+
+</div>
+<script src="<%=coloradmin%>js/apps.min.js"></script>
+	<script>
+ var vm = new Vue({
+    el: '#content',
+    data: {
+      is_upload_loading_txt:"",
+      is_upload_loading:false
+    },
+    mounted: function(){
+      
+    },
+    computed: {
+    },
+    methods: {
+      file_change: file_change
+    }
+
+ })  
+      
+      
+    $(document).ready(function() {
+        App.init();
+    });
+
+    function set_password(){
+      var password={}
+      password.password=$.trim($("#password").val())
+     
+       if(password.password == "這是亂打的啦-.-"){
+         return alert("請輸入新密碼")
+       }
+       if(password.password.length<6){
+         return alert("密碼太短")
+       }
+
+        $.post("/admin/dashboardPassword",password,function(data){
+          if(data == "ok"){
+            alert("重設成功，下次請用這一組登入")
+            location.reload()
+          }else{
+            alert("密碼設定失敗，請洽管理員")
+          }
+
+         })
+    }
+    function success(url,source,number,index){
+       var picture= {}
+       picture.picture = url 
+      
+      $.post("/admin/dashboardPicture",picture,function(data){
+          if(data == "ok"){
+            location.reload()
+          }else{
+            alert("上傳失敗，請洽管理員");
+            location.reload()
+          }
+        })
+  }
+	</script>
+</body>
+</html>

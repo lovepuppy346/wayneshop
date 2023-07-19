@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+	<meta charset="utf-8" />
+	<title><%=headerTitle%> | <%= title%></title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+
+	<link href="<%=coloradmin%>plugins/switchery/switchery.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/powerange/powerange.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+  <link href="<%=coloradmin%>plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+
+  <%include include/all %>
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%include include/header %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%include include/user%>
+				<%include include/nav%>
+			</div>
+		</div>
+		
+<div class="sidebar-bg"></div>
+
+<div id="content" class="content">
+			<h1 class="page-header"><%= title%></h1>
+			<div class="row">
+			    <div class="col-md-12">
+            <div class="panel panel-inverse">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    </div>
+                    <h4 class="panel-title">
+                      <span style="margin-right: 15px;">
+                         <span style="margin-right: 15px;">網站資訊</span>
+                         <button id="cancel_save" @click="cancel_save()" style="display:none;" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save">取消儲存</button>
+                        <button id="save" disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>
+                      
+                      </span>
+                    </h4>
+                </div>
+                 <div class="alert alert-info fade in" style="margin-bottom:0;border-radius:0">
+                   <font style="vertical-align: inherit;">
+                     <i class="fa fa-info-circle fa-lg m-r-5 pull-left m-t-2"></i>
+                       頁尾處資訊編輯
+                   </font>
+                   <span class="close" data-dismiss="alert" style="font-size:16px;">×</span>
+                 </div>
+             
+              <div class="panel-body">
+                <div id="wizard">
+                  <div style="padding-top:15px;">
+                     <div class="row">
+                     <div class="col-md-12">     
+                               <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">聯絡電話</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.phone" type="text" class="form-control" />
+<!--                                     <div style="margin-top:5px;">(限制字數60字以內，含標點符號)</div>-->
+                                  </div>
+                                </div>
+                                </div>
+                           
+                    
+                               <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">聯絡地址</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.addr" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+
+                                <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">客服信箱</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.email" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+                                
+                               <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">營業時間</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.time" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+                                
+                               <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">社群連結(facebook)</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.facebook" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+                                <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">社群連結(instagram)</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.instagram" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+                               <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">社群連結(youtube)</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.youtube" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+<!--
+                                <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">社群連結(twitter)</label>
+                                  <div class="col-md-7">
+                                    <input maxlength="60" v-model="indexInfo.twitter" type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                </div>
+-->
+                           
+                          
+                     </div>
+<!--
+                       <div class="col-md-12">
+                         
+                           <div class="form-horizontal">
+                                <div class="form-group">
+                                  <label class="col-md-3 control-label">公司理念(底部)</label>
+                                  <div class="col-md-7">
+                                     <textarea v-model="indexInfo.bottom_text" class="textarea_use form-control" style="margin-top: 10px;" rows="5">{{bottom_info}}</textarea>
+                                  </div>
+                                </div>
+                           </div>
+                       </div>
+-->
+                     
+                    </div>
+                    <div class="row">
+                         <div class="col-md-12"> 
+                          <div style="margin-left:10px;text-align:center">
+                              <button @click="cancel_save()" style="display:none;" type="button" class="btn btn-default m-r-5 m-b-5 cancel_save">取消儲存</button>
+                              <button disabled="disabled" type="button" @click="save_data()" class="btn btn-primary m-r-5 m-b-5 save">儲存</button>
+                            </div>
+                         </div>
+                      </div>
+                     <hr>
+                  </div>
+              </div>
+            </div>
+         </div>
+       </div>
+		</div>
+  <%include include/scroll_top%>
+</div>
+</div>
+
+
+  <script src="<%=coloradmin%>plugins/switchery/switchery.min.js"></script>
+  <script src="<%=coloradmin%>plugins/powerange/powerange.min.js"></script>
+  <script src="<%=coloradmin%>js/form-slider-switcher.demo.min.js"></script>
+
+  <script src="<%=coloradmin%>js/apps.min.js"></script>
+
+<script>
+  var vm = new Vue({
+    el: '#content',
+    data:{
+      indexInfo: <%-data%>,
+      is_upload_loading_txt : "",
+      is_upload_loading : false
+    },
+    methods: {
+      save_data: function(){
+          var data = JSON.stringify(vm.$data.indexInfo);
+
+          $.post("/admin/indexInfo", {
+            data : data 
+          },function(data){
+            location.reload();
+          })
+
+      },
+      cancel_save:function(){
+        location.reload();
+      },
+      set_save: function(a){
+        if(a){
+          $('#save,.save').attr("disabled","disabled");
+          $("#cancel_save,.cancel_save").hide();
+          $('#new ,.new').removeAttr("disabled");
+          
+        }else{
+          $('#save,.save').removeAttr("disabled");
+          $("#cancel_save,.cancel_save").show()
+          $('#new ,.new').attr("disabled","disabled");
+        }
+      }
+    }
+  })
+
+  $(function(){
+    $('input,textarea').on("change input",function(){
+      vm.set_save();
+    })
+  })
+   
+  $(document).ready(function() {
+    App.init();
+    FormSliderSwitcher.init();
+  });
+       //上方按鈕置頂
+  function save_data(){
+    vm.save_data();
+  }
+  function cancel_save(){
+    vm.cancel_save();
+  }
+  $("#button_use").append('<button onclick="cancel_save()" type="button" class="btn btn-white m-r-5 m-b-5 btn-sm cancel_save" style="display:none;">取消儲存</button><button disabled="disabled" type="button" onclick="save_data()" class="btn btn-primary m-r-5 m-b-5 btn-sm save">儲存</button>')
+  $("#button_use").hide();
+  $(window).scroll(nav_scroll);
+  function nav_scroll(){
+    var _scroll_top=$("#header").offset().top;
+      if(_scroll_top > 100){
+        $("#button_use").show();
+      }else{
+        $("#button_use").hide()
+      }
+      return
+  }  
+</script>
+	
+</body>
+</html>

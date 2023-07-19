@@ -1,0 +1,368 @@
+    <link href="<%=coloradmin%>plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>css/animate.min.css" rel="stylesheet" />
+	<link href="<%=path%>style.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>css/style-responsive.min.css" rel="stylesheet" />
+	
+	<script src="<%=coloradmin%>plugins/pace/pace.min.js"></script>
+	<script src="<%=coloradmin%>plugins/jquery/jquery-1.9.1.min.js"></script>
+	<script src="<%=coloradmin%>plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+	<script src="<%=coloradmin%>plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+	<script src="<%=coloradmin%>plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script src="<%=coloradmin%>plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="<%=coloradmin%>plugins/jquery-cookie/jquery.cookie.js"></script>
+	<script src="<%=path%>vue.min.js"></script>
+
+	<script src="<%=path%>main.js"></script>
+	<link href="<%=path%>main.css" rel="stylesheet" />
+
+<style>
+  .panel-heading-btn{
+    display:none
+  }
+  @media screen and (max-width:992px){
+    a.btn,.fileinput-button,input.form-control,select.form-control,.fr-box{
+      margin-bottom:10px!important;
+      margin-top:10px!important;
+    }
+  }
+  .dataTables_filter{
+    position: absolute;
+    right: 9px;
+  }
+  @media screen and (max-width: 1200px){
+   .dataTables_filter{
+      position: relative;
+      right: 0px;
+    }
+  }
+  .fr-view,.fr-box.fr-basic .fr-element{
+    padding-top: 20px;
+    
+  }
+  .fr-box.fr-basic .fr-element{
+    font-size: 13px;
+    line-height: 22.1px;
+  }
+  .fr-view p, .fr-view div{
+    font-size: 13px;
+    margin-top:0
+  } 
+  .fr-view a:hover{
+    text-decoration : none
+  }
+  .fa-2x {
+    font-size: 1.5em;
+  }
+</style>
+
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = <%-firebaseConfig%>
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+  
+ firebase.auth().onAuthStateChanged(function(user) {
+  // console.log(user,"user")
+   if(location.href.indexOf("/admin/login") == -1){
+      if(user === null) location.href = "/admin/logout"
+   }
+  //拿idtoken
+  //  user.getIdToken().then((token)=>{
+  //   console.log(token,'token')
+   })
+
+
+  function file_change2(e,source){
+      var e = e || window.event;
+      var files = e.target.files;
+
+        var file = files[0];
+        var timestamp =  + Math.floor( Date.now() / 1000);
+        var rand = Math.floor(Math.random() * 10000);
+        var ext = file.name.split('.').pop();
+        var name = rand + timestamp + "." + ext;
+
+        const isLt10M = file.size / 1024 / 1024 < 10;
+        if (!isLt10M) return alert("檔案大小請勿超過 10 mb")
+
+        var update_url =  "file" + "/" + name;
+        
+        var storageRef = firebase.storage().ref().child(update_url);
+        var uploadTask = storageRef.put(file);
+   
+         uploadTask.on('state_changed', snapshot => {
+           //進度調
+           let percentage = parseInt((snapshot.bytesTransferred/snapshot.totalBytes) * 100);
+           console.log(" 上傳中..." + "(" + percentage +"%)");
+         },error=>{
+           alert("上傳失敗")
+         },async ()=>{
+           
+            var storageRef = firebase.storage().ref().child(update_url);
+             storageRef.getDownloadURL().then( url => {
+               success_file(url,file.name)
+             })
+       })
+    }
+  function file_change4(e,source){
+      var e = e || window.event;
+      var files = e.target.files;
+
+        var file = files[0];
+        var timestamp =  + Math.floor( Date.now() / 1000);
+        var rand = Math.floor(Math.random() * 10000);
+        var ext = file.name.split('.').pop();
+        var name = rand + timestamp + "." + ext;
+
+        const isLt10M = file.size / 1024 / 1024 < 1000;
+        if (!isLt10M) return alert("檔案大小請勿超過 1000 mb")
+
+        var update_url =  "file" + "/" + name;
+        
+        var storageRef = firebase.storage().ref().child(update_url);
+        var uploadTask = storageRef.put(file);
+   
+       vm.is_upload_loading_txt4 = " 上傳中..."
+       vm.is_upload_loading4 = true;
+      
+         uploadTask.on('state_changed', snapshot => {
+           //進度調
+           let percentage = parseInt((snapshot.bytesTransferred/snapshot.totalBytes) * 100);
+           vm.is_upload_loading_txt4 = " 上傳中..." + "(" + percentage +"%)";
+         },error=>{
+           alert("上傳失敗")
+         },async ()=>{
+           
+            var storageRef = firebase.storage().ref().child(update_url);
+             storageRef.getDownloadURL().then( url => {
+               success_file4(url,file.name)
+             })
+       })
+    }
+  function file_change(e,source,index){
+      var e = e || window.event;
+      var files = e.target.files;
+
+      let _upload = (_number) =>{
+        _number=_number - 1;
+        var file = files[_number];
+        var timestamp =  + Math.floor( Date.now() / 1000);
+        var rand = Math.floor(Math.random() * 10000);
+        var myVar;
+        var ext = file.name.split('.').pop();
+        var name= rand + timestamp + "." + ext;
+        var name_1920 = rand + timestamp + "_1920x1920" + "." + ext ;  //縮圖1920的檔案名稱
+
+        const isLt10M = file.size / 1024 / 1024 < 10;
+        if (!isLt10M) return alert("檔案大小請勿超過 10 mb")
+
+        var update_url_1920 =  "web" + "/" + name_1920;
+        var update_url =  "web" + "/" + name;
+        
+        var storageRef = firebase.storage().ref().child(update_url);
+        var uploadTask = storageRef.put(file);
+        var length_show = (files.length == 1) ? "" : (files.length - _number)+ "/" +files.length ; 
+        if(source == "files"){
+          vm.is_upload_loading_txt = length_show + " 上傳中..."
+          vm.is_upload_loading = true;
+        }
+   
+         uploadTask.on('state_changed', snapshot => {
+          //進度調
+           let percentage = parseInt((snapshot.bytesTransferred/snapshot.totalBytes) * 100);
+           if(source == "files"){
+             vm.is_upload_loading_txt = length_show + " 上傳中..." + "(" + percentage +"%)";
+           }
+         },error=>{
+           //上傳失敗
+           alert("上傳失敗")
+           if(source == "files"){
+             vm.is_upload_loading = false;
+           }
+         },async ()=>{
+
+           clearTimeout(myVar);
+
+          if(file.type == "image/gif"){ //gif 不轉檔
+             var storageRef = firebase.storage().ref().child(update_url);
+             storageRef.getDownloadURL().then( url => { 
+               success(url,source,_number,index);
+               if(_number>0) _upload(_number);
+             });
+          }else{
+            //不轉檔
+            if(file.size / 1024 / 1024 < 3){
+               var storageRef = firebase.storage().ref().child(update_url);
+               storageRef.getDownloadURL().then( url => {
+                 success(url,source,_number,index)
+                 if(_number>0) _upload(_number);
+               })
+               return
+            }
+           
+            var storageRef_1920 = firebase.storage().ref().child(update_url_1920);
+            let checkDownload = () => {
+             //正在轉檔
+             storageRef_1920.getDownloadURL().then( url => {
+               success(url,source,_number,index);
+               if(_number>0) _upload(_number);
+             }).catch( error => {
+               if(error.code == "storage/object-not-found"){
+                 myVar = setTimeout(checkDownload,1000);
+                 console.log("return checkDownload")
+               }else{
+                 console.error("Error writing document: ", error);
+               }
+            });
+           }
+            if(source == "files"){
+              vm.is_upload_loading_txt = length_show + " 正在轉檔...";
+            }
+            myVar = setTimeout(checkDownload,1200);
+          }
+
+       })
+      }
+
+      _upload(files.length);
+
+    }
+  function file_change3(e,source,index){
+      var e = e || window.event;
+      var files = e.target.files;
+
+      let _upload = (_number) =>{
+        _number=_number - 1;
+        var file = files[_number];
+        var timestamp =  + Math.floor( Date.now() / 1000);
+        var rand = Math.floor(Math.random() * 10000);
+        var myVar;
+        var ext = file.name.split('.').pop();
+        var name= rand + timestamp + "." + ext;
+        var name_1920 = rand + timestamp + "_1920x1920" + "." + ext ;  //縮圖1920的檔案名稱
+
+        const isLt10M = file.size / 1024 / 1024 < 10;
+        if (!isLt10M) return alert("檔案大小請勿超過 10 mb")
+
+        var update_url_1920 =  "web" + "/" + name_1920;
+        var update_url =  "web" + "/" + name;
+        
+        var storageRef = firebase.storage().ref().child(update_url);
+        var uploadTask = storageRef.put(file);
+        var length_show = (files.length == 1) ? "" : (files.length - _number)+ "/" + files.length ;
+        if(source == "files"){
+          vm.is_upload_loading_txt2 = length_show + " 上傳中..."
+          vm.is_upload_loading2 = true;
+        }
+   
+         uploadTask.on('state_changed', snapshot => {
+          //進度調
+           let percentage = parseInt((snapshot.bytesTransferred/snapshot.totalBytes) * 100);
+           if(source == "files"){
+             vm.is_upload_loading_txt2 = length_show + " 上傳中..." + "(" + percentage +"%)";
+           }
+         },error=>{
+           //上傳失敗
+           alert("上傳失敗")
+           if(source == "files"){
+             vm.is_upload_loading2 = false;
+           }
+         },async ()=>{
+
+           clearTimeout(myVar);
+
+          if(file.type == "image/gif"){ //gif 不轉檔
+             var storageRef = firebase.storage().ref().child(update_url);
+             storageRef.getDownloadURL().then( url => { 
+               success2(url,source,_number,index);
+               if(_number>0) _upload(_number);
+             });
+          }else{
+            //不轉檔
+            if(file.size / 1024 / 1024 < 3){
+               var storageRef = firebase.storage().ref().child(update_url);
+               storageRef.getDownloadURL().then( url => {
+                 success2(url,source,_number,index)
+                 if(_number>0) _upload(_number);
+               })
+               return
+            }
+           
+            var storageRef_1920 = firebase.storage().ref().child(update_url_1920);
+            let checkDownload = () => {
+             //正在轉檔
+             storageRef_1920.getDownloadURL().then( url => {
+               success2(url,source,_number,index);
+               if(_number>0) _upload(_number);
+             }).catch( error => {
+               if(error.code == "storage/object-not-found"){
+                 myVar = setTimeout(checkDownload,1000);
+                 console.log("return checkDownload")
+               }else{
+                 console.error("Error writing document: ", error);
+               }
+            });
+           }
+            if(source == "files"){
+              vm.is_upload_loading_txt2 = length_show + " 正在轉檔...";
+            }
+            myVar = setTimeout(checkDownload,1200);
+          }
+
+       })
+      }
+
+      _upload(files.length);
+
+    }
+  
+  function clear_uploadFile(){
+    vm.is_upload_loading =false;
+    vm.is_upload_loading_txt = "";
+  }
+  function clear_uploadFile2(){
+    vm.is_upload_loading2 =false;
+    vm.is_upload_loading_txt2 = "";
+  }
+  
+function timestampToDate(timestamp){
+  var date = new Date(timestamp * 1000);
+    var mm = date.getMonth() + 1; 
+    var dd = date.getDate();
+    return [date.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd
+         ].join('/');
+} 
+   
+function add_none_pace(){
+  Pace.stop();
+  var g = document.createElement('style');
+  g.setAttribute("id", "style_pace"); document.head.appendChild(g).innerHTML=".pace{display:none!important}";
+}
+
+function generateSerial() {
+  var chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+      serialLength = 5,
+      randomSerial = "",
+      i,
+      randomNumber;
+  for (i = 0; i < serialLength; i = i + 1) {
+      randomNumber = Math.floor(Math.random() * chars.length);
+      randomSerial += chars.substring(randomNumber, randomNumber + 1);
+  }
+  return randomSerial 
+}
+</script>

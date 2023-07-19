@@ -1,0 +1,291 @@
+<div id="modal-center" class="uk-flex-top" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <ul class="login-tab uk-flex-center" uk-tab>
+            <li onclick="setTab(1)"><a href="#">登入</a></li>
+            <li onclick="setTab(2)"><a href="#">註冊</a></li>
+        </ul>
+
+        <div class="login-form uk-padding-large">
+            <div class="tab1">
+                <h3 style="font-weight: bold;">登入會員</h3>
+            </div>
+            <div class="tab2">
+                <h3 style="font-weight: bold;">註冊成為會員</h3>
+            </div>
+            <!--          <hr>-->
+            <div class="tab1">
+                <form id="login_form" class="uk-form-stacked">
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">電子郵件</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                            <input class="uk-input" type="email" name="email">
+                            <!--  錯誤的 class： uk-form-danger -->
+                        </div>
+                        <!--
+                  <div class="uk-text-meta uk-text-danger">請輸入email</div>
+                  <div class="uk-text-meta uk-text-danger">沒有發現使用者</div>
+  -->
+                    </div>
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">密碼</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                            <input class="uk-input" type="password" maxlength="30" name="password">
+                        </div>
+                        <!--
+                  <div class="uk-text-meta uk-text-danger">請填寫密碼</div>
+                  <div class="uk-text-meta uk-text-danger">密碼錯誤</div>
+  -->
+                    </div>
+                    <div class="login-form-policy">或 <a onclick="forgetPassword()">忘記密碼</a> 嗎？</div>
+                    <button type="submit" class="uk-button uk-button-primary uk-width-1-1 uk-margin">
+                        <!--                <span  uk-spinner="ratio: 0.8" ></span>-->
+                        <span>登入</span>
+                    </button>
+                    <div class="login-form-tologin">還不是會員，前往 <a onclick="setTab(2)">註冊</a></div>
+                </form>
+                <form id="forgetPassword_form" class="uk-form-stacked">
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">電子郵件</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                            <input class="uk-input" type="email" name="email">
+                        </div>
+                        <!--
+                  <div class="uk-text-meta uk-text-danger">請輸入email</div>
+                  <div class="uk-text-meta uk-text-danger">沒有發現使用者</div>
+  -->
+                    </div>
+                    <div class="login-form-policy">或回 <a onclick="setTab(1)">登入</a> 頁</div>
+                    <button type="submit" class="uk-button uk-button-primary uk-width-1-1 uk-margin">
+                        <!--                <span uk-spinner="ratio: 0.8"  style="position: relative;top:7px"></span>-->
+                        <span>忘記密碼</span>
+                    </button>
+                    <div class="login-form-tologin">還不是會員，前往 <a onclick="setTab(2)">註冊</a></div>
+                </form>
+            </div>
+            <div class="tab2">
+                <form id="register_form" class="uk-form-stacked">
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">電子郵件</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon uk-icon" uk-icon="icon: mail"></span>
+                            <input class="uk-input" type="email" name="email">
+                        </div>
+                        <!--
+                <div class="uk-text-meta uk-text-danger">請輸入email</div>
+                <div class="uk-text-meta uk-text-danger">email 格式不符</div>
+                <div class="uk-text-meta uk-text-danger">email 已經存在</div>
+  -->
+                    </div>
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">密碼</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon uk-icon" uk-icon="icon: lock"></span>
+                            <input class="uk-input" name="password" type="password" maxlength="30">
+                        </div>
+                        <!--
+                  <div class="uk-text-meta uk-text-danger">請填寫密碼</div> 
+                  <div class="uk-text-meta uk-text-danger">請輸入有效的密碼</div> 
+  -->
+                    </div>
+                    <div class="uk-margin">
+                        <label for="form-stacked-text" class="uk-form-label">密碼確認</label>
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon uk-icon" uk-icon="icon: lock"></span>
+                            <input class="uk-input" type="password" name="password">
+                        </div>
+                        <!--                <div class="uk-text-meta uk-text-danger">密碼必須相等</div> -->
+                    </div>
+                    <button type="submit" class="uk-button uk-button-primary uk-width-1-1 uk-margin">
+                        <!--              <span uk-spinner="ratio: 0.8"  style="position: relative;top:7px"></span>-->
+                        <span>一般註冊</span>
+                    </button>
+                    <div class="login-form-tologin">已經註冊過了？ <a onclick="setTab(1)">登入</a></div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(function () {
+        setTab(1);
+    })
+
+    $("#login_form").submit(function (e) {
+        e.preventDefault();
+        //TODO 前端驗證欄位
+        $.ajax({
+            type: "POST",
+            url: "/api/member/login",
+            data: $(this).serialize(), //組成字串
+            success: function (data) {
+                console.log(data, "success")
+                location.reload()
+            },
+            error: function (data) {
+                console.log(data, "error")
+            }
+        });
+        alert("登入表單")
+    })
+    $("#register_form").submit(function (e) {
+        e.preventDefault();
+        //TODO 前端驗證欄位
+        $.ajax({
+            type: "POST",
+            url: "/api/member/add",
+            data: $(this).serialize(), //組成字串
+            success: function (data) {
+                console.log(data, "success")
+            },
+            error: function (data) {
+                console.log(data, "error")
+            }
+        });
+
+        alert("註冊表單")
+    })
+    $("#forgetPassword_form").submit(function (e) {
+        e.preventDefault();
+        //TODO 前端驗證欄位
+        $.ajax({
+            type: "POST",
+            url: "/api/member/forgetEmail",
+            data: $(this).serialize(), //組成字串
+            success: function (data) {
+                console.log(data, "success")
+            },
+            error: function (data) {
+                console.log(data, "error")
+            }
+        });
+        alert("忘記密碼表單")
+    })
+
+    function forgetPassword() {
+        $("#login_form").hide();
+        $("#register_form").hide();
+        $("#forgetPassword_form").show();
+    }
+
+    function setTab(tab) {
+        if (tab == 1) {
+            $(".tab1").show();
+            $(".tab2").hide();
+            $("#forgetPassword_form").hide();
+            $("#login_form").show();
+            $("#register_form").hide();
+            UIkit.tab(".login-tab").show(0);
+        }
+        if (tab == 2) {
+            $("#register_form").show()
+            $("#forgetPassword_form").hide();
+            $("#login_form").hide();
+            $(".tab1").hide();
+            $(".tab2").show();
+            UIkit.tab(".login-tab").show(1);
+        }
+    }
+</script>
+<style>
+    #modal-center .uk-form-stacked {
+        display: none
+    }
+
+    #modal-center .uk-tab::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: -10px;
+        right: -30px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    #modal-center .login-tab a {
+        font-size: 0.95rem;
+    }
+
+    #modal-center .uk-tab>.uk-active>a {
+        border-bottom: 2px solid #0000d3;
+    }
+
+    #modal-center .uk-modal-dialog {
+        width: 450px;
+    }
+
+    #modal-center .uk-modal-full {
+        background-color: white;
+    }
+
+    #modal-center .logo {
+        width: 125px;
+        position: relative;
+        top: 10px;
+        left: -20px;
+    }
+
+    #modal-center .uk-padding-large {
+        max-width: 350px;
+        margin: 0 auto;
+        padding: 0;
+        font-size: 14px;
+    }
+
+    #modal-center .uk-button .uk-icon {
+        position: relative;
+        top: 7px;
+
+    }
+
+    #modal-center .auth-google .uk-icon {
+        position: relative;
+        top: -5px;
+
+    }
+
+    #modal-center *+.uk-margin {
+        margin-top: 15px !important;
+    }
+
+    #modal-center .uk-margin {
+        margin-top: 5px;
+        margin-bottom: 0;
+    }
+
+    #modal-center .login-form h3 {
+        text-align: center;
+        margin: 30px 0 25px 0;
+        font-size: 20px;
+        letter-spacing: 0.05em;
+    }
+
+    #modal-center .login-form hr {
+        margin: 30px 0 25px 0;
+    }
+
+    #modal-center .login-check-auto {
+        margin-right: 4px;
+        font-size: 14px;
+    }
+
+    #modal-center .login-form-policy {
+        width: 100%;
+        margin: 15px 0 0 0;
+        font-size: 14px;
+    }
+
+    #modal-center .login-form-tologin {
+        width: 100%;
+        margin: 20px 0 0 0;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #modal-center .uk-text-meta {
+        margin-top: 3px;
+    }
+</style>

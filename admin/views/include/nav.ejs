@@ -1,0 +1,101 @@
+
+ <ul class="nav">
+  <li class="nav-header">導覽列表</li>
+
+  <li class="has-sub  <% if(title == '管理主頁'){ %> active <%}%>">
+    <a href="/admin/dashboard">
+        <i class="fa fa-laptop"></i>
+        <span>管理主頁</span>
+      </a>
+  </li>
+<%if(session._root=="最高管理者" || session._root.indexOf("管理成員")>-1){%>
+   <li class="has-sub <% if(title == '管理成員'){ %> active <%}%> ">
+      <a href="/admin/memberManage">
+          <i class="fa fa-users"></i>
+          <span>管理成員</span>
+      </a>
+    </li>
+<%}%>
+
+<%if(session._root=="最高管理者" || session._root.indexOf("網站管理者")>-1){%>
+    <li class="has-sub <% if(title.indexOf('網站管理')>-1){ %> active <%}%>">
+      <a href="javascript:;">
+          <b class="caret pull-right"></b>
+          <i class="fa fa-globe"></i>
+          <span>網站管理</span>
+      </a>
+      <ul class="sub-menu acitve">
+        <li class="<% if(title.indexOf('網站管理')>-1){ %><% if(title.indexOf('網站設定')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/parameter">網站設定</a>
+        </li>
+        <li class="<% if(title.indexOf('網站管理')>-1){ %><% if(title.indexOf('網站資訊')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/indexInfo">網站資訊</a>
+        </li>
+        <li class="<% if(title.indexOf('網站管理')>-1){ %><% if(title.indexOf('首頁圖片')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/indexManage">首頁圖片</a>
+        </li>
+        <li class="<% if(title.indexOf('關於我們')>-1){ %><% if(title.indexOf('')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/about">關於我們</a>
+        </li>
+        <li class="<% if(title.indexOf('FAQ')>-1){ %><% if(title.indexOf('')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/faq">FAQ</a>
+        </li>
+      </ul>
+    </li>   
+<%}%>
+
+<%if(session._root=="最高管理者" || session._root.indexOf("文章管理者")>-1){%>
+   
+   <li class="has-sub <% if(title.indexOf('文章管理')>-1){ %> active <%}%>">
+      <a href="javascript:;">
+          <b class="caret pull-right"></b>
+          <i class="fa fa-file-o"></i>
+          <span>文章管理</span>
+      </a>
+      <ul class="sub-menu acitve">
+        <li class="<% if(title.indexOf('文章管理')>-1){ %><% if(title.indexOf('分類管理')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/newsClass">分類管理</a>
+        </li>
+        <li class="<% if(title.indexOf('文章管理')>-1){ %><% if(title.indexOf('內容管理')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/news">內容管理</a>
+        </li>
+      </ul>
+    </li>
+ 
+<%}%>
+
+<%if(session._root=="最高管理者" || session._root.indexOf("產品管理者")>-1){%>
+    <li class="has-sub <% if(title.indexOf('產品管理')>-1){ %> active <%}%>">
+      <a href="javascript:;">
+          <b class="caret pull-right"></b>
+          <i class="fa fa-suitcase"></i>
+          <span>產品管理</span>
+      </a>
+      <ul class="sub-menu acitve">
+        <li class="<% if(title.indexOf('產品管理')>-1){ %><% if(title.indexOf('分類管理')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/productClass">分類管理</a>
+        </li>
+        <li class="<% if(title.indexOf('產品管理')>-1){ %><% if(title.indexOf('產品內容')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/product">產品內容</a>
+        </li>
+      </ul>
+    </li>
+<%}%>
+
+
+<%if(session._root=="最高管理者" || session._root.indexOf("訂單管理者")>-1){%>
+    <li class="has-sub <% if(title.indexOf('訂單管理')>-1){ %> active <%}%>">
+      <a href="javascript:;">
+          <b class="caret pull-right"></b>
+          <i class="fa fa-user"></i>
+          <span>訂單管理</span>
+      </a>
+      <ul class="sub-menu acitve">
+         <li class="<% if(title.indexOf('訂單管理')>-1){ %><% if(title.indexOf('- 網站訂單管理')>-1){ %> active <%}%><%}%>">
+           <a href="/admin/order">網站訂單管理</a>
+         </li>
+      </ul>
+    </li>   
+<%}%>
+
+<li><a href="javascript:;" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>

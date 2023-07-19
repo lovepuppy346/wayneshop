@@ -1,0 +1,72 @@
+<div id="cart-offcanvas" uk-offcanvas="overlay: true; flip: true">
+    <aside class="uk-offcanvas-bar uk-padding-remove">
+        <div class="uk-card uk-card-default uk-card-small uk-height-1-1 uk-flex uk-flex-column tm-shadow-remove">
+            <header class="uk-card-header uk-flex uk-flex-middle">
+                <div class="uk-grid-small uk-flex-1" uk-grid>
+                    <div class="uk-width-expand">
+                        <div class="uk-h3">Cart</div>
+                    </div><button class="uk-offcanvas-close" type="button" uk-close></button>
+                </div>
+            </header>
+            <div class="uk-card-body uk-overflow-auto">
+                <ul class="uk-list uk-list-divider">
+                    <%var total=0%>
+                        <%for(var i=0;i<session.cart.length;i++){%>
+                            <li class="uk-visible-toggle">
+                                <arttcle>
+                                    <div class="uk-grid-small" uk-grid>
+                                        <div class="uk-width-1-4">
+                                            <div class="tm-ratio tm-ratio-4-3"><a class="tm-media-box" href="product">
+                                                    <figure class="tm-media-box-wrap"><img src="<%=session.cart[i].img%>"
+                                                            alt="Apple MacBook Pro 15&quot; Touch Bar MPTU2LL/A 256GB (Silver)">
+                                                    </figure>
+                                                </a></div>
+                                        </div>
+                                        <div class="uk-width-expand">
+                                            <div class="uk-text-meta uk-text-xsmall">Laptop</div><a class="uk-link-heading uk-text-small"
+                                                href="product">
+                                                <%=session.cart[i].name%>
+                                            </a>
+                                            <div class="uk-margin-xsmall uk-grid-small uk-flex-middle" uk-grid>
+                                                <div class="uk-text-bolder uk-text-small">$<%=session.cart[i].money%>
+                                                </div>
+                                                <div class="uk-text-meta uk-text-xsmall">
+                                                    <%=session.cart[i].order_number%> × $<%=session.cart[i].money%>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div><a onclick="remove_cart('<%=session.cart[i].id%>')"
+                                                class="uk-icon-link uk-text-danger uk-invisible-hover" href="#"
+                                                uk-icon="icon: close; ratio: .75" uk-tooltip="Remove"></a></div>
+                                    </div>
+                                </arttcle>
+                            </li>
+                            <% total=total + (session.cart[i].order_number * session.cart[i].money) %>
+                                <%}%>
+
+                </ul>
+            </div>
+            <footer class="uk-card-footer">
+                <div class="uk-grid-small" uk-grid>
+                    <div class="uk-width-expand uk-text-muted uk-h4">Subtotal</div>
+                    <div class="uk-h4 uk-text-bolder">$<%=total%></div>
+                </div>
+                <div class="uk-grid-small uk-child-width-1-1 uk-child-width-1-2@m uk-margin-small" uk-grid>
+                    <div><a class="uk-button uk-button-default uk-margin-small uk-width-1-1" href="cart.html">view
+                            cart</a></div>
+                    <div><a class="uk-button uk-button-primary uk-margin-small uk-width-1-1"
+                            href="checkout.html">checkout</a></div>
+                </div>
+            </footer>
+        </div>
+    </aside>
+</div>
+<script>
+     function remove_cart(id) {
+            $.get("/removeCart?id=" + id, function (data) {
+                alert("移除成功")
+                location.reload();
+            })
+        }
+
+</script>

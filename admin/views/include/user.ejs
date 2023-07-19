@@ -1,0 +1,20 @@
+<ul class="nav">
+  <li class="nav-profile">
+   <%if(session._picture){%>
+    <div class="image" style="background-image: url(<%=session._picture%>);background-size: cover;background-repeat: no-repeat;">
+    </div>
+     <%}else{%>
+    <div class="image">
+   <a href="javascript:;"><img src="<%=coloradmin%>img/user-13.jpg" alt="" /></a>
+    </div>
+      <%}%>
+    <div class="info">
+      <%if(session._root=="最高管理者"){%>
+        最高管理者
+      <%}else{%>
+        一般管理者
+      <%}%>
+      <small><%=session._name%></small>
+    </div>
+  </li>
+</ul>

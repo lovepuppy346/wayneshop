@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <title><%=headerTitle%> | <%= title%></title>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+  <link href="<%=coloradmin%>css/theme/default.css" rel="stylesheet" id="theme" />
+  <link href="<%=coloradmin%>plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" />
+
+	<link href="<%=coloradmin%>plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+	<link href="<%=coloradmin%>plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+	<%-include ('include/all') %>
+	<style>
+    .fa-2x {
+        font-size: 1.2em;
+    }
+
+    .bbb td{
+      background-color: #93cfe5!important;
+        color:#fff;
+    }
+      @media (max-width: 1200px){
+        #data-table_wrapper>.row>.col-sm-6{
+          width:100%;
+        }
+      }
+      @media screen and (max-width: 992px){
+        a.btn, .fileinput-button, input.form-control, .fr-box {
+          margin-bottom: 5px!important;
+          margin-top: 5px!important;
+
+        }
+      }
+  </style>
+</head>
+<body>
+
+<div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+<div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+    <%-include ('include/header') %>
+		<div id="sidebar" class="sidebar">
+			<div data-scrollbar="true" data-height="100%">
+				<%-include ('include/user')%>
+				<%-include ('include/nav')%>
+			</div>
+		</div>
+		
+	<div class="sidebar-bg"></div>
+	
+
+  <div id="content" class="content">
+       <h1 class="page-header"><%= title%></h1>
+			<div class="row">
+			  <div class="col-md-8">
+                    <div class="panel panel-inverse">
+                       <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            </div>
+                            <h4 class="panel-title">會員列表</h4>
+                      </div>
+                       <div class="panel-body">
+                            <table id="data-table" class="table table-striped table-bordered" >
+       
+                                <thead> 
+                                    <tr>
+                                        <th>姓名</th>
+                                        <th>email/備註</th>
+                                        <th>加入時間</th>
+                                        <th>訂閱</th>
+                                        <th>管理</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+ 				<div class="col-md-4">
+					 
+ 					 <div class="panel panel-inverse">
+ 					 	<div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            </div>
+                             <h4 class="panel-title">
+                               <span id="new_product">編輯會員</span>
+                             </h4>
+                          </div>
+						 <div class="panel-body panel-form">
+						 <form id="myForm" class="form-horizontal form-bordered" method="post">
+                                <div class="alert alert-info fade in" style="margin-bottom:0;border-radius:0">
+                                     <font style="vertical-align: inherit;">
+                                       <i class="fa fa-info-circle fa-lg m-r-5 pull-left m-t-2"></i>
+                                        管理者可在此更改使用者的訂閱狀態。
+                                     </font>
+                                     <span class="close" data-dismiss="alert" style="font-size:16px;">×</span>
+                                   </div>
+                                <div v-if="resume_form.uid">
+									<div class="form-group">
+										<label class="control-label col-md-3 col-sm-3">相關資訊 :</label>
+										<div class="col-md-8 col-sm-8">
+                                          <div>姓名：{{resume_form.displayName}}</div>
+										  <div>Email：{{resume_form.email}}</div>
+										  <div>加入時間：{{timestampToData(resume_form.createdAt.seconds,true)}}</div>
+										  <div>
+										     訂閱：{{resume_form.emailNotification ? "是":"否"}}
+										  </div>
+										  <div v-if="resume_form.contact">
+										    關於我: {{resume_form.contact}}
+										  </div>
+										 
+										</div>
+									</div>
+                                 
+                                 
+                                   <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3">訂閱 :</label>
+                                      <div class="col-md-8 col-sm-8">
+                                        <div style="position: relative;top: 5px;">
+                                        
+                                        <input type="checkbox" id="vehicle1" name="vehicle1" v-model="resume_form.emailNotification">
+                                        <label for="vehicle1">訂閱</label>
+                                   
+                                      </div>
+                                    </div>
+                                  </div>
+                                    <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3">備註 :</label>
+                                      <div class="col-md-8 col-sm-8">
+                                        <textarea id="note" name="note" class="textarea_use form-control" rows="5" v-model="resume_form.note"></textarea>
+                                      </div>
+                                    </div>
+									<div class="form-group">
+                                      <div class="col-md-12 col-sm-12" style="text-align:center">
+                                          <button id="edit_button" onclick="_clear()" type="button" style="margin-left:10px;display:none" class="btn btn-white m-r-5">取消編輯</button>
+                                          <button id="submit_button" onclick="save_data()" type="button" class="btn btn-primary" style="display:inline-block">送出</button>
+                                      </div>
+									</div>
+									
+									<input id="member_edit" name="member_edit" type="hidden">
+								</div>
+								<div v-else>
+								   <div class="form-group" style="padding:15px;">
+                                     請先選擇左邊的會員
+                                  </div>
+								</div>
+						   </form>
+						</div>
+					</div>
+ 				</div>
+      </div>
+	</div>
+
+  <%-include ('include/scroll_top')%>
+
+</div>
+
+
+<script src="<%=coloradmin%>plugins/ionRangeSlider/js/ion-rangeSlider/ion.rangeSlider.min.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<script src="<%=coloradmin%>plugins/masked-input/masked-input.min.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+<script src="<%=coloradmin%>plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+<script src="<%=coloradmin%>js/form-plugins.demo.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/DataTables/media/js/jquery.dataTables.js"></script>
+<script src="<%=coloradmin%>plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+<script src="<%=coloradmin%>plugins/DataTables/extensions/Scroller/js/dataTables.scroller.min.js"></script>
+
+<script src="<%=coloradmin%>plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+<script src="<%=coloradmin%>js/apps.min.js"></script>
+
+<script>
+  var vm = new Vue({
+      el: '#content',
+      data: {
+        resume_form: {},
+        is_load: true,
+      },
+      mounted:function(){
+
+      },
+      computed: {
+
+      },
+      methods: {
+     }
+   })
+  function _download(url){
+   window.open (url)
+  }
+   function save_data(){
+      $.post("/admin/member", {
+          data : JSON.stringify(vm.resume_form)
+        },function(data){
+         alert("更新成功")
+          loadData()
+          _clear()
+        })
+   }
+    function htmlFn(_data){
+      return '<a class="btn btn-sm btn-primary edit'+_data.uid+'" onclick="_edit(\''+ _data.uid +'\')" href="javascript:;" style="margin-bottom:4px;margin-right:5px;">編輯</a>'
+    }
+  
+    function timestampToData (timestamp,type){
+      var date = new Date(timestamp * 1000);
+      var mm = date.getMonth() + 1; 
+      var dd = date.getDate();
+      var hh = date.getHours()
+      var nn = date.getMinutes();
+      var ss = date.getSeconds()
+      hh = (hh>9 ? '' : '0') + hh
+      nn = (nn>9 ? '' : '0') + nn
+      if(type){
+         return [date.getFullYear(),
+          (mm>9 ? '' : '0') + mm,
+          (dd>9 ? '' : '0') + dd,
+         ].join('/') + " " +hh+":"+nn+":"+ss ;
+      }
+       return [date.getFullYear(),
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd,
+       ].join('/');
+
+    }
+function _edit(uid){
+
+ var result = db.collection("MEMBER").doc(uid).get().then(function(data){
+          var _data = data.data();
+          vm.resume_form = _data;
+          $("#new_product").html("編輯會員"+'<button style="margin-left:10px; padding: 3px 10px;" onclick="_clear()" class="btn btn-sm btn-info">取消編輯</button><a href="javascript:void(0)" onclick="save_data()" class="btn btn-sm btn-danger" style="display:inline-block;margin-left:10px; padding: 3px 10px;">儲存</a>');
+          $(".bbb").removeClass("bbb");
+          $(".edit" + uid).closest("tr").addClass("bbb")
+   })
+ }
+
+ function _clear(){
+     vm.resume_form = {};
+     $(".bbb").removeClass("bbb");
+     $("#new_product").html("編輯會員");
+  }
+ async function loadData(){
+      //找出所有產品資料
+   $(".dataTables_empty").html("loading...");
+   $("#data-table").addClass("complete");
+   
+     var docRef = db.collection("MEMBER").get().then(function(querySnapshot) {
+        var subscribe = [];
+        querySnapshot.forEach(function(doc){
+          var _data = doc.data();
+          var createdAt = "";
+          if(_data.createdAt){
+            createdAt = timestampToData(_data.createdAt.seconds,false);
+          }
+          var email = _data.email || "";
+          var displayName = _data.displayName || "使用者"
+          var emailNotification = _data.emailNotification ? "是" : "否" 
+          var note = _data.note || "";
+          
+          if(note){
+            email = email + "<hr style='margin-top: 10px;margin-bottom: 7px;'>" + note;
+          }
+          
+          subscribe.push([displayName,email,createdAt,emailNotification , htmlFn(_data)]);
+        })
+
+        $("#data-table").DataTable({
+          lengthMenu: [30, 50, 100],
+          deferRender: !0,
+          scrollY: "auto",
+          scrollCollapse: !0,
+          scroller: 0,
+          responsive: 0,
+          destroy: true,
+          "order": [[2, 'desc']],
+          "aaData": subscribe
+        })
+        setTimeout(function(){
+          Pace.stop();
+        },500)
+
+      })
+ }
+  
+  $(document).ready(function() {
+    App.init();
+    loadData();
+  });
+
+</script>
+</body>
+</html>
