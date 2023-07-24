@@ -43,6 +43,7 @@ exports.payReturnSuccessNeweb = functions.runWith(runtimeOpts).https.onRequest(a
   const env = {
     ...pay_env("prod",2)
   }
+  console.log("藍新正式台測試")
   return payReturnSuccess(req,res,env);
 });
 exports.payReturnSuccessNewebDev = functions.runWith(runtimeOpts).https.onRequest(async (req, res) => {

@@ -2,8 +2,14 @@
     <section class="uk-section uk-section-secondary uk-section-small uk-light">
         <div class="uk-container">
             <div class="uk-grid-medium uk-child-width-1-1 uk-child-width-1-4@m" uk-grid>
-                <div><a class="uk-logo" href="index.html"><img src="images/logo-inverse.svg" width="90" height="32"
-                            alt="Logo"></a>
+                <div>
+                    <%if(PAGE && PAGE.parameter){%>
+                    <a class="uk-logo" href="index.html"><img src="<%=PAGE.parameter.img%>" width="45" height="32"
+                            alt="<%=PAGE.parameter.logo_title%>"></a>
+                            <span>
+                                <%=PAGE.parameter.title%>
+                            </span>
+                    <%}%>
                     <p class="uk-text-small">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut
                         mauris eros. Nulla quis ante sed tortor efficitur facilisis.</p>
                     <ul class="uk-iconnav">
@@ -37,7 +43,7 @@
                 <div>
                     <ul class="uk-list uk-text-small">
                         <li><a class="uk-link-muted" href="#"><span class="uk-margin-small-right"
-                                    uk-icon="receiver"></span><span class="tm-pseudo">8 800 799 99 99</span></a>
+                                    uk-icon="receiver"></span><span class="tm-pseudo"><%=PAGE.indexInfo.phone%></span></a>
                         </li>
                         <li><a class="uk-link-muted" href="#"><span class="uk-margin-small-right"
                                     uk-icon="mail"></span><span class="tm-pseudo">example@example.com</span></a>

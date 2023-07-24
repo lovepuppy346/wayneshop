@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        <%=headerTitle%> | <%= title%>
+    </title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <link href="<%=coloradmin%>css/theme/default.css" rel="stylesheet" id="theme" />
+    <link href="<%=coloradmin%>plugins/jquery-jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" />
+
+    <link href="<%=coloradmin%>plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="<%=coloradmin%>plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css"
+        rel="stylesheet" />
+    <%include include/all %>
+        <style>
+            .fa-2x {
+                font-size: 1.2em;
+            }
+
+            .bbb td {
+                background-color: #93cfe5 !important;
+                color: #fff;
+            }
+
+            @media (max-width: 1200px) {
+                #data-table_wrapper>.row>.col-sm-6 {
+                    width: 100%;
+                }
+            }
+
+            @media screen and (max-width: 992px) {
+
+                a.btn,
+                .fileinput-button,
+                input.form-control,
+                .fr-box {
+                    margin-bottom: 5px !important;
+                    margin-top: 5px !important;
+
+                }
+            }
+        </style>
+</head>
+
+<body>
+
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+
+    <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+
+        <%include include/header %>
+            <div id="sidebar" class="sidebar">
+                <div data-scrollbar="true" data-height="100%">
+                    <%include include/user%>
+                        <%include include/nav%>
+                </div>
+            </div>
+
+            <div class="sidebar-bg"></div>
+
+
+            <div id="content" class="content">
+                <h1 class="page-header clearfix">
+                    <div class="pull-left" style="margin-bottom:10px;margin-right:10px;">
+                        <%= title%>
+                    </div>
+                    <div class="pull-left">
+                        <a href="order"
+                            class="btn m-r-5 m-b-5 <%if(status == ""){%> btn-success <%}else{%> btn-default <%}%> btn-sm">所有訂單</a>
+                        <a href="order?status=1" class="btn m-r-5 m-b-5 <%if(status == " 1"){%> btn-success <%}else{%>
+                                btn-default <%}%> btn-sm">已付款訂單</a>
+                        <a href="order?status=0" class="btn m-r-5 m-b-5 <%if(status == " 0"){%> btn-success <%}else{%>
+                                btn-default <%}%> btn-sm">未付款訂單</a>
+                        <a href="order?status=2" class="btn m-r-5 m-b-5 <%if(status == " 2"){%> btn-success <%}else{%>
+                                btn-default <%}%> btn-sm">已刪除</a>
+                    </div>
+                </h1>
+                <hr style="margin-top:-5px">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="panel panel-inverse">
+                            <div class="panel-heading">
+                                <div class="panel-heading-btn">
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
+                                        data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                        data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                </div>
+                                <h4 class="panel-title">訂單列表</h4>
+                            </div>
+                            <div class="panel-body">
+                                <table id="data-table" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:50px;">訂單編號</th>
+                                            <th>姓名</th>
+                                            <th>email/備註</th>
+                                            <th>
+
+                                                <%if(status=="1" ){%>
+                                                    付款日期
+                                                    <%}else{%>
+                                                        建立日期
+                                                        <%}%>
+
+                                            <th style="width:35px;">狀態</th>
+                                            <th>管理</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for(var i=0;i<order.length;i++){ %>
+                                            <tr id="list_<%=order[i].idno%>" class="odd gradeX">
+                                                <td>
+                                                    <%=order[i].idno%>
+                                                </td>
+                                                <td>
+                                                    <%=order[i].people.displayName%>
+                                                </td>
+                                                <td>
+                                                    <%=order[i].people.email%>
+                                                        <%if(order[i].note){%>
+                                                            <hr style='margin-top: 10px;margin-bottom: 7px;'>
+                                                            <%=order[i].note%>
+                                                                <%}%>
+                                                </td>
+                                                <td>
+                                                    <%if(status=="1" ){%>
+
+                                                        <%=order[i].PaymentDate%>
+                                                            <%}else{%>
+                                                                <%=timestampToData(order[i].createdAt.seconds,true)%>
+                                                                    <%}%>
+                                                </td>
+                                                <td>
+                                                    <%if(order[i].status=="1" ){%>
+                                                        <%if(order[i].pay==1){%>
+                                                            <span style="color:#e72726;">已付款</span>
+                                                            <div>(<%=order[i].total%>)</div>
+                                                            <%}else{%>
+                                                                <span style="color:#348fe2;">手動開通</span>
+                                                                <%}%>
+                                                                    <%}%>
+                                                                        <%if(order[i].status=="0" ){%>
+                                                                            未付款
+                                                                            <%}%>
+                                                                                <%if(order[i].status=="2" ){%>
+                                                                                    已刪除
+                                                                                    <%}%>
+
+
+
+                                                </td>
+
+                                                <td>
+                                                    <a class="btn btn-sm btn-info"
+                                                        onclick="_edit(<%=JSON.stringify(order[i])%>)"
+                                                        href="javascript:;"
+                                                        style="margin-bottom:4px;margin-right:4px;">編輯</a>
+
+                                                </td>
+                                            </tr>
+                                            <%}%>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                        <div class="panel panel-inverse">
+                            <div class="panel-heading">
+                                <div class="panel-heading-btn">
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
+                                        data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                        data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                </div>
+                                <h4 class="panel-title">
+                                    <span id="new_product">編輯訂單</span>
+                                </h4>
+                            </div>
+                            <div class="panel-body panel-form">
+                                <form id="myForm" class="form-horizontal form-bordered" method="post">
+                                    <div class="alert alert-info fade in" style="margin-bottom:0;border-radius:0">
+                                        <font style="vertical-align: inherit;">
+                                            <i class="fa fa-info-circle fa-lg m-r-5 pull-left m-t-2"></i>
+                                            出現紅色已付款的訂單，才是由金流管道付款的訂單。
+                                        </font>
+                                        <span class="close" data-dismiss="alert" style="font-size:16px;">×</span>
+                                    </div>
+                                    <div v-if="resume_form.idno">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">訂單編號 :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div style="position: relative;top: 8px;">{{resume_form.idno}}
+                                                    <span v-if="resume_form.status == '1'">
+                                                        <span v-if="!resume_form.pay"
+                                                            style="color:#348fe2">(由管理者手動開通)</span>
+                                                        <span style="color:#e72726;" v-else>(已付款)</span>
+                                                    </span>
+
+                                                    <span v-if="resume_form.status == '0'">
+                                                        (未付款)
+                                                    </span>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-if="resume_form.TradeNo" class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">對帳編號 :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div style="position: relative;top: 8px;">{{resume_form.TradeNo}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">email :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <input id="email" name="email" class="form-control" rows="5"
+                                                    v-model="resume_form.people.email">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">相關資訊 :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div>姓名：{{resume_form.people.displayName}}</div>
+                                                <div>Email：{{resume_form.people.email}}</div>
+                                                <div>建立時間：{{timestampToData(resume_form.createdAt._seconds,true)}}</div>
+                                                <div>付款時間：{{resume_form.PaymentDate}}</div>
+                                                <div>付款方式：{{resume_form.PaymentType}}
+                                                </div>
+                                                <div>付款時折扣碼：{{resume_form.discount}}</div>
+                                                <div>折扣金額：{{resume_form.discount_money}}</div>
+                                                <div>實際付款金額：{{resume_form.total}}</div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">狀態 :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <div>
+
+                                                    <select v-model="resume_form.status" class="form-control"
+                                                        style="cursor: pointer;">
+                                                        <option value="0">未付款</option>
+                                                        <option value="1">已付款</option>
+                                                        <option value="2">刪除</option>
+                                                    </select>
+                                                    <div style="margin-top:5px;">(狀態若切換為刪除，使用者的訂單也會被刪除)</div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3">備註 :</label>
+                                            <div class="col-md-8 col-sm-8">
+                                                <textarea id="note" name="note" class="textarea_use form-control"
+                                                    rows="5" v-model="resume_form.note"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-12" style="text-align:center">
+
+                                                <button id="submit_button" onclick="save_data()" type="button"
+                                                    class="btn btn-primary" style="display:inline-block">送出</button>
+                                            </div>
+                                        </div>
+
+                                        <input id="member_edit" name="member_edit" type="hidden">
+                                    </div>
+                                    <div v-else>
+                                        <div class="form-group" style="padding:15px;">
+                                            請先選擇左邊的訂單
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <%include include/scroll_top%>
+
+    </div>
+
+
+    <script src="<%=coloradmin%>plugins/ionRangeSlider/js/ion-rangeSlider/ion.rangeSlider.min.js"></script>
+    <script src="<%=coloradmin%>plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+    <script src="<%=coloradmin%>plugins/masked-input/masked-input.min.js"></script>
+    <script src="<%=coloradmin%>plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+
+    <script src="<%=coloradmin%>plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+    <script src="<%=coloradmin%>plugins/bootstrap-select/bootstrap-select.min.js"></script>
+
+    <script src="<%=coloradmin%>js/form-plugins.demo.min.js"></script>
+
+    <script src="<%=coloradmin%>plugins/DataTables/media/js/jquery.dataTables.js"></script>
+    <script src="<%=coloradmin%>plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+    <script src="<%=coloradmin%>plugins/DataTables/extensions/Scroller/js/dataTables.scroller.min.js"></script>
+
+    <script src="<%=coloradmin%>plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+    <script src="<%=coloradmin%>js/apps.min.js"></script>
+
+    <script>
+
+        var vm = new Vue({
+            el: '#content',
+            data: {
+                resume_form: {},
+                is_load: true,
+            },
+            mounted: function () { },
+            computed: {},
+            methods: {
+                timestampToData: function (timestamp, type) {
+                    var date = new Date(timestamp * 1000);
+                    var mm = date.getMonth() + 1;
+                    var dd = date.getDate();
+                    var hh = date.getHours()
+                    var nn = date.getMinutes();
+                    var ss = date.getSeconds()
+                    hh = (hh > 9 ? '' : '0') + hh
+                    nn = (nn > 9 ? '' : '0') + nn
+                    if (type) {
+                        return [date.getFullYear(),
+                        (mm > 9 ? '' : '0') + mm,
+                        (dd > 9 ? '' : '0') + dd,
+                        ].join('/') + " " + hh + ":" + nn + ":" + ss;
+                    }
+                    return [date.getFullYear(),
+                    (mm > 9 ? '' : '0') + mm,
+                    (dd > 9 ? '' : '0') + dd,
+                    ].join('/');
+                }
+            }
+        })
+
+        function save_data() {
+            if (vm.resume_form.people.email == "") return alert("請輸入 email")
+            $.post("/admin/order", {
+                data: JSON.stringify(vm.resume_form)
+            }, function (data) {
+                if (data == "email") return alert("請輸入email")
+                if (data == "uid") return alert("沒發現 uid，此訂單無法更新")
+                alert("更新成功")
+                window.location.reload()
+                //_clear()
+            })
+        }
+
+        function _edit(order) {
+            vm.resume_form = order;
+            $(".bbb").removeClass("bbb");
+            $("#list_" + order.idno).addClass("bbb");
+        }
+        function _clear() {
+            vm.resume_form = {};
+            $(".bbb").removeClass("bbb");
+        }
+        $(document).ready(function () {
+            App.init();
+
+            $("#data-table").DataTable({
+                lengthMenu: [30, 50, 100],
+                responsive: !0,
+                "order": [[3, 'desc']],
+            })
+
+        });
+  
+  <%
+            function timestampToData(timestamp, type) {
+                var date = new Date(timestamp * 1000);
+                var mm = date.getMonth() + 1;
+                var dd = date.getDate();
+                var hh = date.getHours()
+                var nn = date.getMinutes();
+                var ss = date.getSeconds()
+                hh = (hh > 9 ? '' : '0') + hh
+                nn = (nn > 9 ? '' : '0') + nn
+                if (type) {
+                    return [date.getFullYear(),
+                    (mm > 9 ? '' : '0') + mm,
+                    (dd > 9 ? '' : '0') + dd,
+                    ].join('/') + " " + hh + ":" + nn + ":" + ss;
+                }
+                return [date.getFullYear(),
+                (mm > 9 ? '' : '0') + mm,
+                (dd > 9 ? '' : '0') + dd,
+                ].join('/');
+
+            }
+            %>
+
+    </script>
+</body>
+
+</html>

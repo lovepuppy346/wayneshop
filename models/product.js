@@ -37,6 +37,20 @@ let Product = function(data){
         return data 
 
     };
+
+    //取得單一產品內容
+    this.getProductOne = async (id) => {
+      let result = await db.collection("PRODUCT").doc(id).get();
+      let product = {};
+      if(result.data() && result.data().open){
+        product = {
+          id,
+          ...result.data()
+        }
+      }
+      return product;
+    }
+
     this.getProductClassMain = async() => {
         let result = await db.collection("PAGE").doc("productClassMain").get()
         // console.log(result.data());
@@ -83,6 +97,170 @@ let Product = function(data){
                 createdAt : admin.firestore.FieldValue.serverTimestamp()
             })
         }
+
+    this.getProductCount = async () => {
+       //統計主分類的產品數量
+       let result = await db.collection("PRODUCT").where("open","==",true).get();
+       var count = {}
+       var _count = 0
+        result.forEach((doc)=>{
+          if(doc.data()){
+            var data = doc.data();
+            if(!data.productClassMain) return
+            if(count[data.productClassMain] == undefined) count[data.productClassMain] = 0;
+            count[data.productClassMain] = count[data.productClassMain] + 1;
+            _count = _count + 1
+          }
+        })
+       count._count = _count
+       return count
+    };
+
+    //首頁精選資料
+    this.getProductIndexByStar = async () => {
+      let result = db.collection("PRODUCT");
+      result = result.where("index_star","==",true);
+      result = result.where("open", "==", true);
+      result = result.orderBy("sort","desc");
+      result = result.orderBy("updateAt","desc");
+      result = result.limit(10);//只抓十筆資料
+      result = await result.get();
+      let data = [];
+      if(result.size > 0){
+        result.forEach((doc)=>{ 
+         data.push({
+             ...doc.data(),
+             id: doc.id,
+             description: null //移除不必要的資訊(避免一次載入太多資訊)
+         })
+        })
+      }
+      return data; 
+    }
+
+    //載入主分類產品列表
+    // this.getProductByMain = async (id,sort,by,lastId) => {
+    //   let result = db.collection("PRODUCT");
+    //   by = (by>0) ? "desc" : "asc";
+    //   result = result.where("productClassMain","==",id);
+    //   result = result.where("open", "==", true);
+    //   if(sort == "price") {
+    //     result = result.orderBy("money", by);
+    //     result = result.orderBy("updateAt","desc");
+    //   }
+
+    //   if(lastId){
+    //     //取得文檔快照
+    //     //let lastDoc = await db.collection("PRODUCT").doc(lastId).get()
+    //     result = result.startAfter(lastDoc)
+    //   }
+
+    //   result = result.limit(20)
+    //   result = await result.get();
+    //   let data = [];
+    //   if(result.size > 0){
+    //     lastDoc = result.docs[result.docs.length-1]; //純前端可用此方式記入最後一筆快照(只限滾動式分頁)
+    //     // lastId = result.docs[result.docs.length-1].id; //純前端可用此方式記入最後一筆快照(只限滾動式分頁)，更新最後一筆資料的id
+        
+    //     result.forEach((doc)=>{ 
+    //      data.push({
+    //          ...doc.data(),
+    //          id: doc.id,
+    //          description: null //移除不必要的資訊(避免一次載入太多資訊)
+    //      })
+    //     })
+    //   }
+    //   return {
+    //     lastId,
+    //     data
+    //   }; 
+    // }
+      this.saveProductIndex =  async (result,limit) => {
+        //此物件也可交由後台寫入，避免使用者第一次沒資料 loading 太久
+        //後台新增更改刪除產品資料(會影響到順序的)都要把 global 清空
+        result = await result.get();
+        let data = []
+        for(let i=0;i<result.docs.length;i++){
+          if(i==0) {
+            data.push("");
+            continue;
+          }
+          if(i%(limit) == 0 ) {
+            data.push(result.docs[i-1].id);
+          }
+        }
+        console.log("temporary load")
+        return data;
+      }
+
+      this.getProductByMain = async (id,sort,by,index,limit) => {
+        let result = db.collection("PRODUCT");
+        by = (by>0) ? "desc" : "asc";
+        result = result.where("productClassMain","==",id);
+        result = result.where("open", "==", true);
+        if(sort == "price") {
+          result = result.orderBy("money", by);
+          result = result.orderBy("updateAt","desc");
+        }
+        
+        var temporary = id+"_"+sort+"_"+by+"_"+limit //暫存的物件
+        if(!global.product) global.product = {}
+        if(!global.product[temporary]){
+          global.product[temporary] = await this.saveProductIndex(result,limit);
+        }
+
+        if(index<=0) index = 1;
+        if(index >= global.product[temporary].length) index = global.product[temporary].length
+  
+        var lastId = global.product[temporary][index-1];
+        if(lastId) {
+          var lastDoc = await db.collection("PRODUCT").doc(lastId).get(); //後端用 id 查出快照
+          result = result.startAfter(lastDoc);
+        }
+        if(limit) result = result.limit(limit);
+        result = await result.get();
+        let data = [];
+        if(result.size > 0){
+          //lastDoc = result.docs[result.docs.length-1]; 純前端可用此方式記入最後一筆快照(只限滾動式分頁)
+          result.forEach((doc)=>{ 
+          data.push({
+              ...doc.data(),
+              id: doc.id,
+              description: null //移除不必要的資訊(避免一次載入太多資訊)
+          })
+          })
+        }
+        return {
+          data,
+          pagination: global.product[temporary] || [],
+          index
+        }
+    }
+
+    //取得隨機產品
+    this.getProductRandom = async (id,productClass) => {
+      let result = db.collection("PRODUCT");
+      result = result.where("productClass","==",productClass);
+      result = result.where("open", "==", true);
+      result = await result.get();
+      
+      let data = [];
+      if(result.size > 0){
+        result.forEach((doc)=>{
+         if(doc.id == id) return
+         data.push({
+             ...doc.data(),
+             id: doc.id,
+             description: null //移除不必要的資訊(避免一次載入太多資訊)
+         })
+        })
+      }
+      data = data.sort(() => Math.random() - 0.5)//隨機排序
+      data = data.slice(0,7) //最多四筆
+      
+      return data; 
+    }
+
 }
 
 Product.prototype  = { //使用原型屬性

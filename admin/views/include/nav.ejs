@@ -91,9 +91,12 @@
           <span>訂單管理</span>
       </a>
       <ul class="sub-menu acitve">
-         <li class="<% if(title.indexOf('訂單管理')>-1){ %><% if(title.indexOf('- 網站訂單管理')>-1){ %> active <%}%><%}%>">
-           <a href="/admin/order">網站訂單管理</a>
+         <li class="<% if(title.indexOf('訂單管理')>-1){ %><% if(title.indexOf('- 網站會員管理')>-1){ %> active <%}%><%}%>">
+           <a href="/admin/member">網站會員管理</a>
          </li>
+        <li class="<% if(title.indexOf('訂單管理')>-1){ %><% if(title.indexOf('- 網站訂單管理')>-1){ %> active <%}%><%}%>">
+          <a href="/admin/order">網站訂單管理</a>
+        </li>
       </ul>
     </li>   
 <%}%>

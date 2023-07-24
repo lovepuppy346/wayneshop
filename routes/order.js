@@ -7,7 +7,7 @@ const ecpay_payment = require('../ECPAY_Payment_node_js');
 
 const pay_env = require('../firebase/functions/pay.env')
 const env = {
-  ...pay_env(process.env.NODE_ENV,1)
+  ...pay_env(process.env.NODE_ENV,2)
 }
 
 router.post('/', async function(req, res, next) {

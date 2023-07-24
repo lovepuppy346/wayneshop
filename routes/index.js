@@ -5,9 +5,16 @@ var Product = require("../models/product");//Product 建構式
 var Member = require("../models/member");//Member 建構式
 
 /* GET home page. */
-router.get(['/', '/index.html'], function(req, res, next) {
- res.render('index', { title: 'index' });
-});
+router.get('/', async function(req, res, next) {
+  let product = new Product();
+  let product_list = [];
+  try{
+    product_list = await product.getProductIndexByStar();
+  }catch(err){
+    console.log(err,"err")
+  }
+  res.render('index', { title: '韋恩購物網', product_list });
+})
 
 router.get('/demo', async function(req, res, next) {
 
@@ -164,13 +171,69 @@ router.get('/cart.html', function(req, res, next) {
  res.render('cart', { title: 'Express' });
 });
 
-router.get('/catalog.html', function(req, res, next) {
- res.render('catalog', { title: 'Express' });
-});
+router.get('/catalog.html', async function(req, res, next) {
+  let product = new Product();
+  let count = {}
+  try{
+    count = await product.getProductCount();
+  }catch(err){
+    console.log(err,"err")
+  } 
+  console.log(count,"count")
+  res.render('catalog', { title: '產品目錄', count });
+ });
 
-router.get('/category.html', function(req, res, next) {
- res.render('category', { title: 'Express' });
-});
+// router.get('/category.html', async function(req, res, next) {
+//   let id = req.query.id || "";
+//   let sort = req.query.sort || "money"
+//   let by = req.query.by || 1 ;
+//   let lastId = req.query.lastId || ""
+
+//   if(!id) return res.redirect("/");
+   
+//   let product = new Product();
+//   let product_list = [];
+//   try{
+//     product_list = await product.getProductByMain(id,sort,by,lastId);
+//   }catch(err){
+//     console.log(err,"err")
+//   }
+//   // console.log(product_list,"product_list")
+
+//   res.render('category', { title: '產品分類', 
+//       product_list: product_list.data,
+//       lastId: product_list.lastId , 
+//       id,
+//       by,
+//       sort 
+//   });
+//  })
+router.get('/category.html', async function(req, res, next) {
+  let id = req.query.id || "";
+  let sort = req.query.sort || "price"
+  let by = req.query.by || 1 ;
+  if(!id) return res.redirect("/");
+   
+  let index = Number(req.query.index) || 1;
+  let limit = 20;//每頁筆數
+  let product = new Product();
+  let product_data = {};
+  try{
+    product_data = await product.getProductByMain(id,sort,by,index,limit);
+  }catch(err){
+    console.log(err,"err")
+  }
+  
+  res.render('category', {
+    title: '產品分類', 
+    product_list:product_data.data,
+    id,
+    by,
+    sort,
+    index: product_data.index,
+    pagination: product_data.pagination || []
+  });
+ })
 
 router.get('/checkout.html', function(req, res, next) {
  res.render('checkout', { title: 'Express' });
@@ -209,9 +272,27 @@ router.get('/personal.html', async function(req, res, next) {
   
   res.render('personal', { title: '個人資訊',userRecord});
 });
-router.get('/product.html', function(req, res, next) {
- res.render('product', { title: 'Express' });
-});
+
+router.get('/product.html', async function(req, res, next) {
+  let id = req.query.id || "";
+  if(!id) return res.redirect("/");
+  let product = new Product();
+   
+  let product_data = {};
+  let product_list = [];
+   
+  try{
+    product_data = await product.getProductOne(id);
+  }catch(err){
+    console.log(err,"err")
+  }
+  if(!product_data) return res.redirect("/"); //沒有資料
+  
+  product_list = await product.getProductRandom(id,product_data.productClass);//使用子分類
+  console.log(product_list,"product_list")
+  res.render('product', { title: '產品頁', product: product_data, product_list});
+ });
+
 router.get('/settings.html', function(req, res, next) {
     var err = req.query.err
  res.render('settings', { title: '設定', err });

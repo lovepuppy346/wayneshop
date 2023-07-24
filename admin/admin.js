@@ -309,7 +309,7 @@ router.get('/faq', async function(req, res, next) {
 
 router.get('/member', async function(req, res, next) {
   var id = req.query.id || "";
-  res.render('member', { title: '課程學生管理 - 網站會員管理'});
+  res.render('member', { title: '訂單管理 - 網站會員管理'});
 });
 router.post('/member', async function(req, res, next) {
   let data = JSON.parse(req.body.data);
@@ -481,49 +481,98 @@ router.post('/productClass', async function(req, res, next) {
 
 //取得產品列表
 router.get('/product', async function(req, res, next) {
-  console.log("test1")
+  try {
+    // console.log("test1");
   
-  var _open = req.query.open || 1;
-  console.log("test2")
-  var open = (_open == 1) ? true : false
+    var _open = req.query.open || 1;
+    // console.log("test2");
+    var open = (_open == 1) ? true : false;
   
-  let productClassMain = []
-  //找出分類
-  var ref = db.collection("PAGE").doc("productClassMain");
-  let result_data = await ref.get();
-  if(result_data.data()) productClassMain = result_data.data().data;
+    let productClassMain = [];
+    //找出分類
+    var ref = db.collection("PAGE").doc("productClassMain");
+    let result_data = await ref.get();
+    // console.log(result_data,"result_data")
+    if (result_data.exists) {
+      productClassMain = result_data.data().data;
+    }
   
-  //找出所有產品
-  var docRef = db.collection("PRODUCT").where("open", "==", open)
+    //找出所有產品
+    var docRef = db.collection("PRODUCT").where("open", "==", open);
+  console.log(docRef,"docRef")
+    var product = [];
   
-  var product = [];
+    const querySnapshot = await docRef.get();
   
-  await docRef.get().then(function(querySnapshot) {
-    console.log(querySnapshot)
-    
-    querySnapshot.forEach(function(doc){
+    querySnapshot.forEach(function(doc) {
       var _data = doc.data();
       var name = _data.name || "";
       var money = _data.money || "";
-      var sort = _data.sort || 0
-      var time = _data.updateAt ? _data.updateAt.seconds : 0
-      
+      var sort = _data.sort || 0;
+      var time = _data.updateAt ? _data.updateAt.seconds : 0;
+  
       product.push({
         id: doc.id,
         sort: sort,
-        name,
-        money,
-        time
+        name: name,
+        money: money,
+        time: time
       });
-      console.log(_data,"test")
-      // console.log("test3")
-      // return res.send("")
-    })
-  })
+      console.log(_data, "test");
+    });
   
-  res.render('product', { title: '產品管理 - 產品內容', product , productClassMain ,open:_open });
-  
+    res.render('product', { title: '產品管理 - 產品內容', product: product, productClassMain: productClassMain, open: _open });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
+// router.get('/product', async function(req, res, next) {
+  
+  // console.log("test1")
+  
+  // var _open = req.query.open || 1;
+  // console.log("test2")
+  // var open = (_open == 1) ? true : false
+  
+  // let productClassMain = []
+  // //找出分類
+  // var ref = db.collection("PAGE").doc("productClassMain");
+  // let result_data = await ref.get();
+  // if(result_data.data()) productClassMain = result_data.data().data;
+  
+  // //找出所有產品
+  // var docRef = db.collection("PRODUCT").where("open", "==", open)
+  
+  // var product = [];
+  
+  // await docRef.get().then(function(querySnapshot) {
+  //   console.log(querySnapshot)
+    
+  //   querySnapshot.forEach(function(doc){
+  //     var _data = doc.data();
+  //     var name = _data.name || "";
+  //     var money = _data.money || "";
+  //     var sort = _data.sort || 0
+  //     var time = _data.updateAt ? _data.updateAt.seconds : 0
+      
+  //     product.push({
+  //       id: doc.id,
+  //       sort: sort,
+  //       name,
+  //       money,
+  //       time
+  //     });
+  //     console.log(_data,"test")
+  //     // console.log("test3")
+  //     // return res.send("")
+  //   })
+  // })
+  
+  // res.render('product', { title: '產品管理 - 產品內容', product , productClassMain ,open:_open });
+  
+// });
 
 //儲存產品
 router.post('/product', async function(req, res, next) {
@@ -536,11 +585,15 @@ router.post('/product', async function(req, res, next) {
         updateAt: admin.firestore.FieldValue.serverTimestamp()
       },{merge:true})
     }else{
-      await db.collection("PRODUCT").add({
-        ...data,
-        updateAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      })
+      //for(var i=0;i<500;i++){
+        await db.collection("PRODUCT").add({
+          ...data,
+          updateAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          //name: data.name + "("+ i +")"
+        })
+        //console.log(i)
+      //}
     }
     res.send("ok");
   });
@@ -557,5 +610,45 @@ router.post('/productDelete', async function(req, res, next) {
   res.send("ok");
 });
 
+//取得訂單列表
+router.get('/order', async function(req, res, next) {
+  var status = req.query.status || "";
+  //找出訂單
+  var order = [];
+  var ref = db.collectionGroup("ORDER");
 
+ if(!status){
+   ref = ref.where("status","<", 2);
+ }else{
+   ref = ref.where("status","==", Number(status));
+ }
+
+  var data = await ref.get();
+  
+  data.forEach(doc => {
+    order.push(doc.data())
+  })
+  res.render('order', { title: '訂單管理 - 網站訂單管理', order, status });
+
+});
+
+//儲存訂單資料
+ router.post('/order', async function(req, res, next) {
+    let data = JSON.parse(req.body.data);
+    if(!data.people.email) return res.send("email")
+    if(data.people.uid){
+      var ref = db.collection("MEMBER").doc(data.people.uid).collection("ORDER").doc(data.idno);
+    }else{//非會員訂單
+      var ref = db.collection("ORDER").doc(data.idno);
+    }
+
+    await ref.update({
+      note: data.note || "",
+      status: Number(data.status),
+      "people.email": data.people.email,
+      updateAt: admin.firestore.FieldValue.serverTimestamp()
+    })
+    res.send("ok")
+  
+  }) 
 module.exports = router;

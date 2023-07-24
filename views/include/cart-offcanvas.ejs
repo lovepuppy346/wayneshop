@@ -23,7 +23,10 @@
                                                 </a></div>
                                         </div>
                                         <div class="uk-width-expand">
-                                            <div class="uk-text-meta uk-text-xsmall">Laptop</div><a class="uk-link-heading uk-text-small"
+                                            <%if(productClassMain[session.cart[i].productClassMain]){%>
+                                                <div class="uk-text-meta uk-text-xsmall"><%=productClassMain[session.cart[i].productClassMain].name%></div>
+                                            <%}%>
+                                            <a class="uk-link-heading uk-text-small"
                                                 href="product">
                                                 <%=session.cart[i].name%>
                                             </a>

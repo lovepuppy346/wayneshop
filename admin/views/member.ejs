@@ -9,7 +9,7 @@
 
 	<link href="<%=coloradmin%>plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
 	<link href="<%=coloradmin%>plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
-	<%-include ('include/all') %>
+	<%include include/all %>
 	<style>
     .fa-2x {
         font-size: 1.2em;
@@ -39,11 +39,11 @@
 
 <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
 
-    <%-include ('include/header') %>
+    <%include include/header %>
 		<div id="sidebar" class="sidebar">
 			<div data-scrollbar="true" data-height="100%">
-				<%-include ('include/user')%>
-				<%-include ('include/nav')%>
+				<%include include/user%>
+				<%include include/nav%>
 			</div>
 		</div>
 		
@@ -156,7 +156,7 @@
       </div>
 	</div>
 
-  <%-include ('include/scroll_top')%>
+  <%include include/scroll_top%>
 
 </div>
 

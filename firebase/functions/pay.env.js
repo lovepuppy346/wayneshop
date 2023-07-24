@@ -19,12 +19,9 @@ const env =  function(NODE_ENV,source){
         adminEmail : "test@gmail.com",//最高管理者的 email
         firebase_api_key : "AIzaSyALA6oyfglngUWUwcl_snykCApPGmWRam0"
         }
-        if(NODE_ENV != "dev"){ //填寫正式環境的env
-        env = {
-            action: "https://core.newebpay.com/MPG/mpg_gateway",//藍新串接網址
-            OperationMode : "Production",//綠界
-        };
-    }
+        if(NODE_ENV == "prod"){ //填寫正式環境的env
+            env = require('./env')(source);
+        }
     return env;
 
 }

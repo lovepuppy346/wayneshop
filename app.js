@@ -76,7 +76,16 @@ app.use("/returnEcpay", (req,res) =>{
 })
 
 
-app.use("/admin",firebaseAdmin);  //admin 安裝 (請放在這個位置)
+app.use("/admin",function(req, res, next){
+  //這邊實作清空全域共用資訊
+  if(req.method == "POST") {
+    //if(req.originalUrl== "/admin/parameter") app.locals.PAGE = null; //針對特定頁面
+    app.locals.PAGE = undefined;
+    if(req.originalUrl== "/admin/product") global.product = {}
+  }
+  return firebaseAdmin(req,res);
+});//admin 安裝 (請放在這個位置)
+
 
 // app.use(middle1);
 
@@ -119,7 +128,7 @@ app.use("/*",(async(req,res,next)=>{  //所有請求都會經過
   //       res.errorInfo = err.errorInfo; //把錯誤訊息傳到 res 物件
   //       console.log(err,"err")
   //   }
-  // }
+  
 
 
   // console.log(req.sessionID)
@@ -127,8 +136,44 @@ app.use("/*",(async(req,res,next)=>{  //所有請求都會經過
   res.locals.session = req.session; // 將session 保存在 res 給 ejs 使用
   res.locals.session = res.locals.session || {}; //防止都沒資料
 
+
+//網站全域共用資訊
+  if(app.locals.PAGE === undefined || app.locals.productClassMain === undefined || app.locals.productClass === undefined || true){
+    let PAGE = {};
+    let productClassMain = {};
+    let productClass = {};
+    try{
+      let result = await db.collection("PAGE").get();
+      result.forEach( data => {
+        if(data.data()) PAGE[data.id] = data.data();
+        if(data.id == "productClassMain"){
+          var _data = data.data().data;
+          productClassMain = {
+            ...productClassMain,
+            ...convertArrayToObject(_data,"id") || {}
+          }
+          for(var i=0;i<_data.length;i++){
+            productClass = {
+              ...productClass,
+              ...convertArrayToObject(_data[i].productClass,"id")
+            } 
+          }
+        } 
+      })
+    }catch(err){
+      console.log(err,"err")
+    }
+
+    console.log(productClass,"productClass")
+    app.locals.PAGE = PAGE;
+    app.locals.productClassMain = productClassMain;
+    app.locals.productClass = productClass;
+  }
+
   next()
 }));
+
+
 //認證會員 middleware
 app.use(['/account.html','/favorites.html','/personal.html','/settings.html'], auth);
 
@@ -153,5 +198,18 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+//陣列轉物件程式
+const convertArrayToObject = (array, key) => {
+  const initialValue = {};
+  return array.reduce((obj, item) => {
+    return {
+      ...obj,
+      [item[key]]: {
+        ...item
+      }
+    };
+  }, initialValue);
+};
 
 module.exports = app;

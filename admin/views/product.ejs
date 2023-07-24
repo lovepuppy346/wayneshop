@@ -193,6 +193,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-md-3">產品型號 :</label>
+                                        <div class="col-md-8">
+                                            <input v-model.trim="product.type" class="form-control" type="text" placeholder="填寫產品型號" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="control-label col-md-3">產品說明 :</label>
                                         <div class="col-md-8">
                                             <input v-model.trim="product.description" class="form-control" type="text"
@@ -254,7 +260,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-3">價錢 :</label>
                                         <div class="col-md-8">
-                                            <input v-model.trim="product.money" class="form-control" type="number"
+                                            <input v-model.number="product.money" class="form-control" type="number"
                                                 placeholder="填寫價錢" />
                                             <div style="margin-top: 5px;">(付款時實際支出的金額)</div>
                                         </div>
@@ -262,7 +268,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-3">訂價 :</label>
                                         <div class="col-md-8">
-                                            <input v-model.trim="product.price" class="form-control" type="number"
+                                            <input v-model.number="product.price" class="form-control" type="number"
                                                 placeholder="填寫價錢" />
                                         </div>
                                     </div>
@@ -458,6 +464,7 @@
                 productClassMain: "", //主分類 id
                 productClass: "", //次分類 id
                 img: "", //產品圖示
+                type:"", //產品型號
                 p_img: "", //產品輪播圖
                 money: 0, //訂價
                 price: 0, //目前價錢
@@ -634,7 +641,7 @@
                 $('.textarea_use').froalaEditor({
                     heightMin: 500,
                     heightMax: 1000,
-      <% include include / froalaeditor_tool %>
+      <%include include/froalaeditor_tool %>
     }).on('froalaEditor.contentChanged', function (e, editor) {
                         $('#preview').html(editor.html.get());
             })
